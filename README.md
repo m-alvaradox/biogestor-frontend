@@ -1,59 +1,85 @@
-# BiogestorFrontend
+# BioGestor Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.1.
+Frontend de BioGestor para gestionar datos y recursos de aprendizaje automático destinados a investigación acuícola.
 
-## Development server
+## Tecnologías
 
-To start a local development server, run:
+- Angular 22.2.
+- Componentes standalone.
+- Angular Router.
+- SCSS.
 
-```bash
-ng serve
-```
+## Requisitos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js y npm compatibles con la versión de Angular del proyecto.
+- Git.
 
-## Code scaffolding
+Las versiones de las dependencias están definidas en `package.json` y `package-lock.json`.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Instalación
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Desde la raíz del proyecto:
 
 ```bash
-ng generate --help
+npm ci
 ```
 
-## Building
-
-To build the project run:
+## Ejecución local
 
 ```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guardar cambios en el código.
 
-## Running unit tests
+## Rutas disponibles
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+| Ruta | Pantalla |
+|---|---|
+| `/dashboard` | Panel principal con indicadores de demostración |
+| `/login` | Acceso de demostración |
+
+La ruta raíz `/` redirige a `/dashboard`. Las rutas desconocidas también redirigen al Dashboard.
+
+El acceso es simulado y los indicadores utilizan datos de ejemplo. Todavía no existe conexión con una API ni autenticación real.
+
+## Estructura inicial
+
+```text
+src/app/
+├── core/
+│   └── layout/
+│       ├── app-layout/
+│       ├── sidebar/
+│       └── navbar/
+├── shared/
+│   └── ui/
+│       └── stat-card/
+├── features/
+│   ├── auth/
+│   │   └── pages/login/
+│   └── dashboard/
+│       └── pages/dashboard/
+├── app.config.ts
+└── app.routes.ts
+```
+
+- `core`: layout principal y elementos de navegación.
+- `shared`: componentes reutilizables.
+- `features`: pantallas organizadas por funcionalidad.
+
+## Compilación
 
 ```bash
-ng test
+npm run build
 ```
 
-## Running end-to-end tests
+Genera la aplicación en `dist/`.
 
-For end-to-end (e2e) testing, run:
+## Pruebas
 
 ```bash
-ng e2e
+npm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Ejecuta las pruebas del proyecto.
