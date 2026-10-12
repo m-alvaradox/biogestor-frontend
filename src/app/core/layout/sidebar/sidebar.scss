@@ -1,0 +1,27 @@
+aside {
+    padding: 24px 16px;
+}
+
+h2 {
+    margin: 0 0 32px;
+    color: #2563eb;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+a {
+    padding: 12px;
+    border-radius: 8px;
+    color: #475569;
+    text-decoration: none;
+
+    &:hover,
+    &.active {
+        background: #eff6ff;
+        color: #2563eb;
+    }
+}

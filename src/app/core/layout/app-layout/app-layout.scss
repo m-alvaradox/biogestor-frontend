@@ -1,0 +1,30 @@
+:host {
+    display: block;
+}
+
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+app-sidebar {
+    flex: 0 0 240px;
+    background: white;
+    border-right: 1px solid #e2e8f0;
+}
+
+.main-area {
+    flex: 1;
+    min-width: 0;
+}
+
+app-navbar {
+    display: block;
+    padding: 16px 24px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.page-content {
+    padding: 24px;
+}

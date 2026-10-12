@@ -1,0 +1,16 @@
+<section aria-labelledby="dashboard-title">
+    <header class="page-header">
+        <h1 id="dashboard-title">Panel principal</h1>
+        <p>Resumen de datos y recursos de investigación acuícola.</p>
+    </header>
+
+    <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+        <app-stat-card [label]="stat.label" [value]="stat.value" [description]="stat.description" />
+        }
+    </div>
+
+    <p class="demo-notice">
+        Datos de demostración. La conexión con la API se implementará después.
+    </p>
+</section>
