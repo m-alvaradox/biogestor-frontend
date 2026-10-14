@@ -11,7 +11,7 @@ Frontend de BioGestor para gestionar datos y recursos de aprendizaje automático
 
 ## Requisitos
 
-- Node.js y npm compatibles con la versión de Angular del proyecto.
+- Node.js 24.15 o superior (Angular 22 también admite Node ^22.22.3 o >=26) y npm.
 - Git.
 
 Las versiones de las dependencias están definidas en `package.json` y `package-lock.json`.
@@ -83,3 +83,14 @@ npm test
 ```
 
 Ejecuta las pruebas del proyecto.
+
+## Integración continua
+
+El flujo `.github/workflows/ci.yml` se ejecuta con GitHub Actions en cada Pull Request y push hacia `develop` o `main`, y también puede lanzarse manualmente desde la pestaña Actions (`workflow_dispatch`). Con Node.js 24:
+
+1. Instala las dependencias con `npm ci` a partir de `package-lock.json`.
+2. Ejecuta las pruebas unitarias (`npm test -- --watch=false`).
+3. Compila la aplicación en modo producción (`npm run build`), incluyendo los presupuestos de tamaño de `angular.json`.
+4. Publica la carpeta `dist/biogestor-frontend` como artefacto descargable durante 7 días.
+
+Se recomienda configurar este job como comprobación obligatoria en la protección de las ramas `develop` y `main`.
