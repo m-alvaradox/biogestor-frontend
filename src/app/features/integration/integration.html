@@ -1,0 +1,21 @@
+<section aria-labelledby="integration-title">
+  <h1 id="integration-title">Prueba de integración Sprint 0</h1>
+  <p>Registro sintético consultado desde PostgreSQL mediante la API.</p>
+
+  <button type="button" (click)="load()" [disabled]="loading()">Consultar de nuevo</button>
+
+  @if (loading()) {
+    <p role="status">Consultando registro…</p>
+  }
+
+  @if (error()) {
+    <p role="alert">{{ error() }}</p>
+  }
+
+  @if (record(); as data) {
+    <div>
+      <p><strong>Identificador:</strong> {{ data.id }}</p>
+      <p><strong>Mensaje:</strong> {{ data.message }}</p>
+    </div>
+  }
+</section>
