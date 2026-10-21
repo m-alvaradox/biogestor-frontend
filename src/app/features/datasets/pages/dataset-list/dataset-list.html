@@ -1,0 +1,63 @@
+<section class="datasets-page">
+  <!-- Encabezado de la página -->
+  <header class="page-header">
+    <div class="page-heading">
+      <h1>Datasets</h1>
+      <p>Registra y administra datasets de cualquier tipo.</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-primary"
+      disabled
+      title="El registro de datasets estará disponible próximamente"
+    >
+      + Nuevo conjunto
+    </button>
+  </header>
+
+  <!-- Catálogo de datasets -->
+  <section class="catalog-card" aria-label="Catálogo de datasets">
+    <!-- Controles de búsqueda y filtrado -->
+    <div class="catalog-toolbar">
+      <input
+        type="search"
+        class="search-input"
+        placeholder="Buscar conjuntos de datos..."
+        aria-label="Buscar datasets"
+        disabled
+      />
+
+      <select class="type-filter" aria-label="Filtrar datasets por tipo" disabled>
+        <option>Todos los tipos</option>
+      </select>
+    </div>
+
+    <!-- Tabla del catálogo -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Investigador</th>
+            <th scope="col">Fecha de registro</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-state-content">
+                <h2>Catálogo pendiente de integración</h2>
+                <p>Los datasets se mostrarán aquí cuando se implemente la conexión con la API.</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>
