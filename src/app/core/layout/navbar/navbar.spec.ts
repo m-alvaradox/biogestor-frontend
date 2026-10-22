@@ -18,4 +18,10 @@ describe('Navbar', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  // Prueba para no tener seccion usuario en la barra superior.
+  it('should not render a user section', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.user-info')).toBeNull();
+    expect(el.querySelector('.user-avatar')).toBeNull();
+  });
 });

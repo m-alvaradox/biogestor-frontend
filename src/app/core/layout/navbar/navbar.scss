@@ -5,8 +5,8 @@
 .navbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  // justify-content: space-between;
+  // gap: 16px;
   width: 100%;
   min-height: 24px;
 }
@@ -21,48 +21,7 @@
   font-weight: 500;
 }
 
-.navbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.user-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #dbeafe;
-  color: #2563eb;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.user-name {
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.user-role {
-  color: #64748b;
-  font-size: 11px;
-}
-
 @media (max-width: 768px) {
-  .user-info {
-    display: none;
-  }
-
   .platform-name {
     font-size: 12px;
   }
