@@ -1,15 +1,28 @@
-<aside>
+<aside class="sidebar">
+  <div class="sidebar-header">
     <h2>BioGestor</h2>
+  </div>
 
-    <nav aria-label="Navegación principal">
-        <a 
-            routerLink="/dashboard"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-        >
-            Panel Principal
-        </a>
+  <nav class="sidebar-nav" aria-label="Navegación principal">
+    @for (item of navigationItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span class="nav-icon" [class]="'icon-' + item.icon" aria-hidden="true"></span>
 
-        <a routerLink="/login">Ir al inicio de sesión</a>
-    </nav>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <span class="user-avatar" aria-hidden="true">U</span>
+
+    <div class="user-info">
+      <span class="user-name">Usuario</span>
+      <span class="user-role">Perfil pendiente</span>
+    </div>
+  </div>
 </aside>
