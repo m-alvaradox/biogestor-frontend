@@ -36,14 +36,31 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 
 | Ruta | Pantalla |
 |---|---|
-| `/dashboard` | Panel principal con indicadores de demostración |
 | `/login` | Acceso de demostración |
+| `/dashboard` | Panel principal con indicadores de demostración |
+| `/datasets` | Catálogo de datasets conectado a la API |
+| `/integrations` | Prueba de integración del Sprint 0 (`/integration` redirige aquí) |
+| `/models`, `/model-versions`, `/experiments`, `/observations`, `/users`, `/settings` | Módulos pendientes, con una pantalla provisional |
 
 La ruta raíz `/` redirige a `/dashboard`. Las rutas desconocidas también redirigen al Dashboard.
 
-El acceso es simulado y los indicadores utilizan datos de ejemplo. Todavía no existe conexión con una API ni autenticación real.
+El acceso es simulado y los indicadores del Dashboard utilizan datos de ejemplo. Todavía no existe autenticación real.
 
-## Estructura inicial
+## Conexión con el backend
+
+`npm start` usa `proxy.conf.json`, que reenvía las peticiones a `/api/**` hacia el backend en http://localhost:8080. Las pantallas de Datasets e Integración necesitan el backend activo.
+
+## Catálogo de datasets
+
+La pantalla `/datasets` consulta `GET /api/v1/datasets/` mediante `DatasetService.list()` y muestra la primera página de resultados (10 datasets).
+
+- Columnas: Nombre, Tipo, Investigador, Fecha de registro, Estado y Acciones.
+- Tipo y estado se muestran en español como badges. La columna Investigador muestra el id del responsable o "—" si no tiene.
+- Estados de la pantalla: cargando, error con botón "Reintentar", vacío ("No hay datasets registrados") y tabla con datos.
+- La columna Acciones muestra "Ver", "Editar" y "Eliminar" en cada fila. Por ahora son solo visuales: no navegan ni ejecutan ninguna acción.
+- La búsqueda, los filtros por tipo y estado, el orden y la paginación todavía no están conectados.
+
+## Estructura
 
 ```text
 src/app/
@@ -53,19 +70,26 @@ src/app/
 │       ├── sidebar/
 │       └── navbar/
 ├── shared/
+│   ├── pages/
+│   │   └── module-placeholder/
 │   └── ui/
 │       └── stat-card/
 ├── features/
 │   ├── auth/
 │   │   └── pages/login/
-│   └── dashboard/
-│       └── pages/dashboard/
+│   ├── dashboard/
+│   │   └── pages/dashboard/
+│   ├── datasets/
+│   │   ├── models/
+│   │   ├── pages/dataset-list/
+│   │   └── services/
+│   └── integration/
 ├── app.config.ts
 └── app.routes.ts
 ```
 
 - `core`: layout principal y elementos de navegación.
-- `shared`: componentes reutilizables.
+- `shared`: componentes y pantallas reutilizables.
 - `features`: pantallas organizadas por funcionalidad.
 
 ## Compilación
