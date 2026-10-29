@@ -4,9 +4,44 @@
   box-sizing: border-box;
 }
 
+:root {
+  --color-text: #0f172a;
+  --color-text-body: #334155;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+  --color-text-placeholder: #94a3b8;
+
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-strong: #e2e8f0;
+  --color-border: #e2e8f0;
+
+  --color-primary: #2563eb;
+  --color-primary-soft: #eff6ff;
+  --color-primary-muted: #dbeafe;
+  --color-on-primary: #ffffff;
+
+  --color-danger: #dc2626;
+  --color-danger-border: #fecaca;
+
+  --color-success-bg: #dcfce7;
+  --color-success-text: #166534;
+  --color-warning-bg: #fef3c7;
+  --color-warning-text: #92400e;
+  --color-danger-bg: #fee2e2;
+  --color-danger-text: #991b1b;
+
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --radius-pill: 999px;
+
+  --page-max-width: 1600px;
+}
+
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--color-text);
+  background: var(--color-bg);
 }

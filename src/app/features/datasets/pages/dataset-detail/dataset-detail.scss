@@ -4,14 +4,14 @@
 
 .detail-page {
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
 }
 
 .back-link {
   display: inline-block;
   margin-bottom: 16px;
-  color: #2563eb;
+  color: var(--color-primary);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -30,7 +30,7 @@
 
   h1 {
     margin: 0 0 8px;
-    color: #0f172a;
+    color: var(--color-text);
     font-size: 26px;
     font-weight: 700;
   }
@@ -44,7 +44,7 @@
 
 .header-meta {
   margin: 0;
-  color: #64748b;
+  color: var(--color-text-muted);
   font-size: 14px;
 }
 
@@ -58,7 +58,7 @@
 .btn-danger {
   padding: 10px 16px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-control);
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -72,20 +72,20 @@
 }
 
 .btn-primary {
-  background: #2563eb;
-  color: #ffffff;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .btn-secondary {
-  border-color: #e2e8f0;
-  background: #ffffff;
-  color: #334155;
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-body);
 }
 
 .btn-danger {
-  border-color: #fecaca;
-  background: #ffffff;
-  color: #dc2626;
+  border-color: var(--color-danger-border);
+  background: var(--color-surface);
+  color: var(--color-danger);
 }
 
 .detail-grid {
@@ -97,13 +97,13 @@
 .detail-card,
 .state-card {
   padding: 24px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
 
   h2 {
     margin: 0 0 16px;
-    color: #0f172a;
+    color: var(--color-text);
     font-size: 16px;
     font-weight: 600;
   }
@@ -114,7 +114,7 @@
 
   p {
     margin: 0 0 16px;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 14px;
   }
 }
@@ -128,12 +128,12 @@ dl {
 }
 
 dt {
-  color: #64748b;
+  color: var(--color-text-muted);
 }
 
 dd {
   margin: 0;
-  color: #0f172a;
+  color: var(--color-text);
   overflow-wrap: anywhere;
 }
 

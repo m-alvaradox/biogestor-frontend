@@ -108,6 +108,8 @@ src/app/
 - `shared`: componentes, pipes y pantallas reutilizables.
 - `features`: pantallas organizadas por funcionalidad.
 
+`src/styles.scss` define en `:root` la paleta de colores, los radios de borde y el ancho máximo de página como variables CSS (`--color-*`, `--radius-*`, `--page-max-width`). Los `.scss` de los componentes usan `var(--…)` en lugar de valores fijos.
+
 ## Compilación
 
 ```bash

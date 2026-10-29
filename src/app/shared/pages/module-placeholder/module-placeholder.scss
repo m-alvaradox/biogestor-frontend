@@ -4,7 +4,7 @@
 
 .module-page {
   width: 100%;
-  max-width: 1600px;
+  max-width: var(--page-max-width);
   margin: 0 auto;
 }
 
@@ -13,14 +13,14 @@
 
   h1 {
     margin: 0 0 8px;
-    color: #0f172a;
+    color: var(--color-text);
     font-size: 26px;
     font-weight: 700;
   }
 
   p {
     margin: 0;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 14px;
   }
 }
@@ -31,9 +31,9 @@
   justify-content: center;
   min-height: 280px;
   padding: 32px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
 }
 
 .placeholder-content {
@@ -42,14 +42,14 @@
 
   h2 {
     margin: 0 0 12px;
-    color: #334155;
+    color: var(--color-text-body);
     font-size: 18px;
     font-weight: 600;
   }
 
   p {
     margin: 0;
-    color: #64748b;
+    color: var(--color-text-muted);
     font-size: 14px;
     line-height: 1.6;
   }
