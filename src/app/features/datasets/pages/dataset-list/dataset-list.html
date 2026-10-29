@@ -43,13 +43,14 @@
             <th scope="col">Investigador</th>
             <th scope="col">Fecha de registro</th>
             <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
 
         <tbody>
           @if (loading()) {
             <tr>
-              <td colspan="5" class="empty-state">
+              <td colspan="6" class="empty-state">
                 <div class="empty-state-content">
                   <p>Cargando datasets...</p>
                 </div>
@@ -57,7 +58,7 @@
             </tr>
           } @else if (error()) {
             <tr>
-              <td colspan="5" class="empty-state">
+              <td colspan="6" class="empty-state">
                 <div class="empty-state-content">
                   <h2>{{ error() }}</h2>
                   <button type="button" class="btn-primary" (click)="load()">Reintentar</button>
@@ -82,10 +83,17 @@
                     {{ statusLabels[dataset.status] }}
                   </span>
                 </td>
+                <td>
+                  <div class="row-actions">
+                    <button type="button" class="action action-view">Ver</button>
+                    <button type="button" class="action action-edit">Editar</button>
+                    <button type="button" class="action action-delete">Eliminar</button>
+                  </div>
+                </td>
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="empty-state">
+                <td colspan="6" class="empty-state">
                   <div class="empty-state-content">
                     <h2>No hay datasets registrados</h2>
                     <p>Los datasets aparecerán aquí cuando se registren en BioGestor.</p>

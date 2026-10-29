@@ -164,6 +164,37 @@ td {
   color: #991b1b;
 }
 
+.row-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.action-view {
+  color: #2563eb;
+}
+
+.action-edit {
+  color: #334155;
+}
+
+.action-delete {
+  color: #dc2626;
+}
+
 // Estado vacío
 .empty-state {
   padding: 64px 24px;
@@ -208,7 +239,7 @@ td {
   }
 
   table {
-    min-width: 750px;
+    min-width: 850px;
   }
 
   .empty-state {

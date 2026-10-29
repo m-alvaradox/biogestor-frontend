@@ -13,7 +13,7 @@ describe('DatasetList', () => {
   const emptyPage: DatasetPage = { count: 0, next: null, previous: null, results: [] };
 
   const filledPage: DatasetPage = {
-    count: 2,
+    count: 3,
     next: null,
     previous: null,
     results: [
@@ -32,6 +32,14 @@ describe('DatasetList', () => {
         status: 'processing',
         owner: null,
         created_at: '2026-10-18T10:00:00Z',
+      },
+      {
+        id: 3,
+        name: 'Mediciones de oxígeno',
+        type: 'csv',
+        status: 'error',
+        owner: 5,
+        created_at: '2026-10-15T08:45:00Z',
       },
     ],
   };
@@ -76,7 +84,14 @@ describe('DatasetList', () => {
       (element as HTMLElement).textContent?.trim(),
     );
 
-    expect(headers).toEqual(['Nombre', 'Tipo', 'Investigador', 'Fecha de registro', 'Estado']);
+    expect(headers).toEqual([
+      'Nombre',
+      'Tipo',
+      'Investigador',
+      'Fecha de registro',
+      'Estado',
+      'Acciones',
+    ]);
   });
 
   it('should show a loading message while the request is pending', () => {
@@ -99,22 +114,42 @@ describe('DatasetList', () => {
     respond(filledPage);
 
     const cells = rows().map((row) =>
-      Array.from(row.querySelectorAll('td')).map((cell) => cell.textContent?.trim()),
+      Array.from(row.querySelectorAll('td'))
+        .slice(0, 5)
+        .map((cell) => cell.textContent?.trim()),
     );
 
     expect(cells).toEqual([
       ['Cantos de aves', 'Audio', '3', '20/10/2026', 'Activo'],
       ['Fotos de estanques', 'Imagen', '—', '18/10/2026', 'Procesando'],
+      ['Mediciones de oxígeno', 'CSV', '5', '15/10/2026', 'Error'],
     ]);
   });
 
   it('should apply a badge class for each status', () => {
     respond(filledPage);
 
-    const badges = rows().map((row) => row.querySelector('td:last-child span'));
+    const badges = rows().map((row) => row.querySelector('td:nth-child(5) span'));
 
     expect(badges[0]?.classList).toContain('badge-active');
     expect(badges[1]?.classList).toContain('badge-processing');
+    expect(badges[2]?.classList).toContain('badge-error');
+  });
+
+  it('should show view, edit and delete actions for each dataset', () => {
+    respond(filledPage);
+
+    const actions = rows().map((row) =>
+      Array.from(row.querySelectorAll('.row-actions button')).map((button) =>
+        button.textContent?.trim(),
+      ),
+    );
+
+    expect(actions).toEqual([
+      ['Ver', 'Editar', 'Eliminar'],
+      ['Ver', 'Editar', 'Eliminar'],
+      ['Ver', 'Editar', 'Eliminar'],
+    ]);
   });
 
   it('should show an error and retry the request', () => {
@@ -134,7 +169,7 @@ describe('DatasetList', () => {
     respond(filledPage);
 
     expect(component.error()).toBe('');
-    expect(rows().length).toBe(2);
+    expect(rows().length).toBe(3);
   });
 
   it('should keep unavailable controls disabled', () => {
