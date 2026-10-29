@@ -113,8 +113,9 @@ Ejecuta las pruebas del proyecto.
 El flujo `.github/workflows/ci.yml` se ejecuta con GitHub Actions en cada Pull Request y push hacia `develop` o `main`, y también puede lanzarse manualmente desde la pestaña Actions (`workflow_dispatch`). Con Node.js 24:
 
 1. Instala las dependencias con `npm ci` a partir de `package-lock.json`.
-2. Ejecuta las pruebas unitarias (`npm test -- --watch=false`).
-3. Compila la aplicación en modo producción (`npm run build`), incluyendo los presupuestos de tamaño de `angular.json`.
-4. Publica la carpeta `dist/biogestor-frontend` como artefacto descargable durante 7 días.
+2. Verifica las convenciones de código con ESLint (`npm run lint`).
+3. Ejecuta las pruebas unitarias (`npm test -- --watch=false`).
+4. Compila la aplicación en modo producción (`npm run build`), incluyendo los presupuestos de tamaño de `angular.json`.
+5. Publica la carpeta `dist/biogestor-frontend` como artefacto descargable durante 7 días.
 
 Se recomienda configurar este job como comprobación obligatoria en la protección de las ramas `develop` y `main`.
