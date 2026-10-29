@@ -8,32 +8,12 @@
   margin: 0 auto;
 }
 
-.page-header {
-  margin-bottom: 24px;
-
-  h1 {
-    margin: 0 0 8px;
-    color: var(--color-text);
-    font-size: 26px;
-    font-weight: 700;
-  }
-
-  p {
-    margin: 0;
-    color: var(--color-text-muted);
-    font-size: 14px;
-  }
-}
-
 .placeholder-card {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 280px;
   padding: 32px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
 }
 
 .placeholder-content {

@@ -2,21 +2,21 @@
   <a routerLink="/datasets" class="back-link">← Volver al catálogo</a>
 
   @if (loading()) {
-    <div class="state-card">
+    <div class="card state-card">
       <p>Cargando dataset...</p>
     </div>
   } @else if (notFound()) {
-    <div class="state-card">
+    <div class="card state-card">
       <h2>No encontrado</h2>
       <p>No existe un dataset con el identificador "{{ id() }}".</p>
     </div>
   } @else if (error()) {
-    <div class="state-card">
+    <div class="card state-card">
       <h2>{{ error() }}</h2>
       <button type="button" class="btn-primary" (click)="load()">Reintentar</button>
     </div>
   } @else if (dataset(); as dataset) {
-    <header class="detail-header">
+    <header class="page-header detail-header">
       <div>
         <h1>{{ dataset.name }}</h1>
         <div class="header-badges">
@@ -40,7 +40,7 @@
     </header>
 
     <div class="detail-grid">
-      <section class="detail-card" aria-labelledby="metadata-title">
+      <section class="card detail-card" aria-labelledby="metadata-title">
         <h2 id="metadata-title">Metadatos</h2>
         <dl>
           <dt>Especie</dt>
@@ -58,7 +58,7 @@
         </dl>
       </section>
 
-      <section class="detail-card" aria-labelledby="storage-title">
+      <section class="card detail-card" aria-labelledby="storage-title">
         <h2 id="storage-title">Almacenamiento</h2>
         <dl>
           <dt>Ubicación</dt>

@@ -110,6 +110,8 @@ src/app/
 
 `src/styles.scss` define en `:root` la paleta de colores, los radios de borde y el ancho máximo de página como variables CSS (`--color-*`, `--radius-*`, `--page-max-width`). Los `.scss` de los componentes usan `var(--…)` en lugar de valores fijos.
 
+Además, `src/styles.scss` define clases globales para los elementos que se repiten entre pantallas: `.page-header` (título `h1` y descripción), `.card` (borde, radio y fondo de tarjeta) y los botones `.btn-primary`, `.btn-secondary` y `.btn-danger`. Cada componente agrega a esas clases solo su distribución propia (por ejemplo, el `padding` de cada tarjeta).
+
 ## Compilación
 
 ```bash
