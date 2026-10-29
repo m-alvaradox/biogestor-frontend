@@ -39,6 +39,7 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 | `/login` | Acceso de demostración |
 | `/dashboard` | Panel principal con indicadores de demostración |
 | `/datasets` | Catálogo de datasets conectado a la API |
+| `/datasets/:id` | Detalle de un dataset |
 | `/integrations` | Prueba de integración del Sprint 0 (`/integration` redirige aquí) |
 | `/models`, `/model-versions`, `/experiments`, `/observations`, `/users`, `/settings` | Módulos pendientes, con una pantalla provisional |
 
@@ -55,10 +56,20 @@ El acceso es simulado y los indicadores del Dashboard utilizan datos de ejemplo.
 La pantalla `/datasets` consulta `GET /api/v1/datasets/` mediante `DatasetService.list()` y muestra la primera página de resultados (10 datasets).
 
 - Columnas: Nombre, Tipo, Investigador, Fecha de registro, Estado y Acciones.
-- Tipo y estado se muestran en español como badges. La columna Investigador muestra el id del responsable o "—" si no tiene.
+- Tipo y estado se muestran en español como badges. Si el estado es `null` o vacío, se muestra "Sin estado". La columna Investigador muestra el nombre del responsable o "—" si no tiene.
 - Estados de la pantalla: cargando, error con botón "Reintentar", vacío ("No hay datasets registrados") y tabla con datos.
-- La columna Acciones muestra "Ver", "Editar" y "Eliminar" en cada fila. Por ahora son solo visuales: no navegan ni ejecutan ninguna acción.
+- La columna Acciones muestra "Ver", "Editar" y "Eliminar" en cada fila. "Ver" abre el detalle del dataset; "Editar" y "Eliminar" están deshabilitados.
 - La búsqueda, los filtros por tipo y estado, el orden y la paginación todavía no están conectados.
+
+## Detalle de dataset
+
+La pantalla `/datasets/:id` consulta `GET /api/v1/datasets/:id/` mediante `DatasetService.get(id)`.
+
+- Encabezado: nombre, badges de tipo y estado, investigador y fecha de registro. "Editar" y "Eliminar" están deshabilitados.
+- Metadatos: especie, granja, piscina, fecha de captura y los campos de `type_metadata` como pares clave/valor.
+- Almacenamiento: ubicación (`s3_uri`), formato, tamaño (formateado desde bytes) y cantidad de archivos.
+- Estados de la pantalla: cargando, "No encontrado" (si la API responde 404 o el id no es un número), error con botón "Reintentar" y detalle con datos.
+- Los campos sin valor (`null` o texto vacío) se muestran como "—". Un 0 se muestra como 0.
 
 ## Estructura
 
@@ -72,7 +83,10 @@ src/app/
 ├── shared/
 │   ├── pages/
 │   │   └── module-placeholder/
+│   ├── pipes/
+│   │   └── file-size/
 │   └── ui/
+│       ├── badge/
 │       └── stat-card/
 ├── features/
 │   ├── auth/
@@ -80,8 +94,10 @@ src/app/
 │   ├── dashboard/
 │   │   └── pages/dashboard/
 │   ├── datasets/
+│   │   ├── components/
 │   │   ├── models/
 │   │   ├── pages/dataset-list/
+│   │   ├── pages/dataset-detail/
 │   │   └── services/
 │   └── integration/
 ├── app.config.ts
@@ -89,7 +105,7 @@ src/app/
 ```
 
 - `core`: layout principal y elementos de navegación.
-- `shared`: componentes y pantallas reutilizables.
+- `shared`: componentes, pipes y pantallas reutilizables.
 - `features`: pantallas organizadas por funcionalidad.
 
 ## Compilación

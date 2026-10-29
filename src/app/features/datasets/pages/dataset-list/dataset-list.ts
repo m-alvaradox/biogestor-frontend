@@ -1,10 +1,13 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Dataset, DatasetStatus, DatasetType } from '../../models/dataset';
+import { RouterLink } from '@angular/router';
+import { DatasetStatusBadge } from '../../components/dataset-status-badge/dataset-status-badge';
+import { DatasetTypeBadge } from '../../components/dataset-type-badge/dataset-type-badge';
+import { Dataset } from '../../models/dataset';
 import { DatasetService } from '../../services/dataset';
 
 @Component({
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink, DatasetStatusBadge, DatasetTypeBadge],
   selector: 'app-dataset-list',
   styleUrl: './dataset-list.scss',
   templateUrl: './dataset-list.html',
@@ -15,22 +18,6 @@ export class DatasetList implements OnInit {
   readonly datasets = signal<Dataset[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');
-
-  readonly typeLabels: Record<DatasetType, string> = {
-    audio: 'Audio',
-    image: 'Imagen',
-    video: 'Video',
-    csv: 'CSV',
-    text: 'Texto',
-    other: 'Otro',
-  };
-
-  readonly statusLabels: Record<DatasetStatus, string> = {
-    active: 'Activo',
-    processing: 'Procesando',
-    archived: 'Archivado',
-    error: 'Error',
-  };
 
   ngOnInit(): void {
     this.load();

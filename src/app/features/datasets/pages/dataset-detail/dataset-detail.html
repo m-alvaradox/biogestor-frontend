@@ -1,0 +1,78 @@
+<section class="detail-page">
+  <a routerLink="/datasets" class="back-link">← Volver al catálogo</a>
+
+  @if (loading()) {
+    <div class="state-card">
+      <p>Cargando dataset...</p>
+    </div>
+  } @else if (notFound()) {
+    <div class="state-card">
+      <h2>No encontrado</h2>
+      <p>No existe un dataset con el identificador "{{ id() }}".</p>
+    </div>
+  } @else if (error()) {
+    <div class="state-card">
+      <h2>{{ error() }}</h2>
+      <button type="button" class="btn-primary" (click)="load()">Reintentar</button>
+    </div>
+  } @else if (dataset(); as dataset) {
+    <header class="detail-header">
+      <div>
+        <h1>{{ dataset.name }}</h1>
+        <div class="header-badges">
+          <app-dataset-type-badge [type]="dataset.type" />
+          <app-dataset-status-badge [status]="dataset.status" />
+        </div>
+        <p class="header-meta">
+          Investigador: {{ dataset.owner?.name || '—' }} · Registrado el
+          {{ dataset.created_at | date: 'dd/MM/yyyy' }}
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button type="button" class="btn-secondary" disabled title="Disponible próximamente">
+          Editar
+        </button>
+        <button type="button" class="btn-danger" disabled title="Disponible próximamente">
+          Eliminar
+        </button>
+      </div>
+    </header>
+
+    <div class="detail-grid">
+      <section class="detail-card" aria-labelledby="metadata-title">
+        <h2 id="metadata-title">Metadatos</h2>
+        <dl>
+          <dt>Especie</dt>
+          <dd>{{ dataset.species || '—' }}</dd>
+          <dt>Granja</dt>
+          <dd>{{ dataset.farm || '—' }}</dd>
+          <dt>Piscina</dt>
+          <dd>{{ dataset.pool || '—' }}</dd>
+          <dt>Fecha de captura</dt>
+          <dd>{{ dataset.capture_date ? (dataset.capture_date | date: 'dd/MM/yyyy') : '—' }}</dd>
+          @for (entry of typeMetadata(); track entry.key) {
+            <dt>{{ entry.key }}</dt>
+            <dd>{{ entry.value }}</dd>
+          }
+        </dl>
+      </section>
+
+      <section class="detail-card" aria-labelledby="storage-title">
+        <h2 id="storage-title">Almacenamiento</h2>
+        <dl>
+          <dt>Ubicación</dt>
+          <dd>
+            <code>{{ dataset.storage.s3_uri || '—' }}</code>
+          </dd>
+          <dt>Formato</dt>
+          <dd>{{ dataset.storage.file_format || '—' }}</dd>
+          <dt>Tamaño</dt>
+          <dd>{{ dataset.storage.size_bytes | fileSize }}</dd>
+          <dt>Archivos</dt>
+          <dd>{{ dataset.storage.file_count ?? '—' }}</dd>
+        </dl>
+      </section>
+    </div>
+  }
+</section>

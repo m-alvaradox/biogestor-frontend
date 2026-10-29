@@ -70,24 +70,32 @@
               <tr>
                 <td>{{ dataset.name }}</td>
                 <td>
-                  <span class="badge badge-type">{{ typeLabels[dataset.type] }}</span>
+                  <app-dataset-type-badge [type]="dataset.type" />
                 </td>
-
-                <!-- Cambiar cuando exista data de Usuarios. -->
-                <td>{{ dataset.owner ?? '—' }}</td>
-                <!-- Actualmente solo muestra el ID si esta disponible '-' si no. -->
-
+                <td>{{ dataset.owner?.name || '—' }}</td>
                 <td>{{ dataset.created_at | date: 'dd/MM/yyyy' }}</td>
                 <td>
-                  <span [class]="'badge badge-' + dataset.status">
-                    {{ statusLabels[dataset.status] }}
-                  </span>
+                  <app-dataset-status-badge [status]="dataset.status" />
                 </td>
                 <td>
                   <div class="row-actions">
-                    <button type="button" class="action action-view">Ver</button>
-                    <button type="button" class="action action-edit">Editar</button>
-                    <button type="button" class="action action-delete">Eliminar</button>
+                    <a [routerLink]="['/datasets', dataset.id]" class="action action-view">Ver</a>
+                    <button
+                      type="button"
+                      class="action action-edit"
+                      disabled
+                      title="Disponible próximamente"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      class="action action-delete"
+                      disabled
+                      title="Disponible próximamente"
+                    >
+                      Eliminar
+                    </button>
                   </div>
                 </td>
               </tr>

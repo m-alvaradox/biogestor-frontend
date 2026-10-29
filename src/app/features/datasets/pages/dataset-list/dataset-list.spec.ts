@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 import { DatasetPage } from '../../models/dataset';
 import { DatasetList } from './dataset-list';
@@ -22,14 +23,14 @@ describe('DatasetList', () => {
         name: 'Cantos de aves',
         type: 'audio',
         status: 'active',
-        owner: 3,
+        owner: { id: 3, name: 'Dra. Ana Lima' },
         created_at: '2026-10-20T15:30:00Z',
       },
       {
         id: 2,
         name: 'Fotos de estanques',
         type: 'image',
-        status: 'processing',
+        status: null,
         owner: null,
         created_at: '2026-10-18T10:00:00Z',
       },
@@ -38,7 +39,7 @@ describe('DatasetList', () => {
         name: 'Mediciones de oxígeno',
         type: 'csv',
         status: 'error',
-        owner: 5,
+        owner: { id: 5, name: 'Ing. Carlos Vera' },
         created_at: '2026-10-15T08:45:00Z',
       },
     ],
@@ -47,7 +48,7 @@ describe('DatasetList', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DatasetList],
-      providers: [provideHttpClient(), provideHttpClientTesting()],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DatasetList);
@@ -120,28 +121,28 @@ describe('DatasetList', () => {
     );
 
     expect(cells).toEqual([
-      ['Cantos de aves', 'Audio', '3', '20/10/2026', 'Activo'],
-      ['Fotos de estanques', 'Imagen', '—', '18/10/2026', 'Procesando'],
-      ['Mediciones de oxígeno', 'CSV', '5', '15/10/2026', 'Error'],
+      ['Cantos de aves', 'Audio', 'Dra. Ana Lima', '20/10/2026', 'Activo'],
+      ['Fotos de estanques', 'Imagen', '—', '18/10/2026', 'Sin estado'],
+      ['Mediciones de oxígeno', 'CSV', 'Ing. Carlos Vera', '15/10/2026', 'Error'],
     ]);
   });
 
-  it('should apply a badge class for each status', () => {
+  it('should apply a badge tone for each status', () => {
     respond(filledPage);
 
-    const badges = rows().map((row) => row.querySelector('td:nth-child(5) span'));
+    const badges = rows().map((row) => row.querySelector('td:nth-child(5) app-badge'));
 
-    expect(badges[0]?.classList).toContain('badge-active');
-    expect(badges[1]?.classList).toContain('badge-processing');
-    expect(badges[2]?.classList).toContain('badge-error');
+    expect(badges[0]?.classList).toContain('badge-success');
+    expect(badges[1]?.classList).toContain('badge-neutral');
+    expect(badges[2]?.classList).toContain('badge-danger');
   });
 
   it('should show view, edit and delete actions for each dataset', () => {
     respond(filledPage);
 
     const actions = rows().map((row) =>
-      Array.from(row.querySelectorAll('.row-actions button')).map((button) =>
-        button.textContent?.trim(),
+      Array.from(row.querySelectorAll('.row-actions .action')).map((action) =>
+        action.textContent?.trim(),
       ),
     );
 
@@ -150,6 +151,25 @@ describe('DatasetList', () => {
       ['Ver', 'Editar', 'Eliminar'],
       ['Ver', 'Editar', 'Eliminar'],
     ]);
+  });
+
+  it('should link each dataset to its detail page', () => {
+    respond(filledPage);
+
+    const links = rows().map((row) => row.querySelector('.action-view')?.getAttribute('href'));
+
+    expect(links).toEqual(['/datasets/1', '/datasets/2', '/datasets/3']);
+  });
+
+  it('should keep edit and delete actions disabled', () => {
+    respond(filledPage);
+
+    const buttons = Array.from(
+      fixture.nativeElement.querySelectorAll('.action-edit, .action-delete'),
+    ) as HTMLButtonElement[];
+
+    expect(buttons.length).toBe(6);
+    expect(buttons.every((button) => button.disabled)).toBe(true);
   });
 
   it('should show an error and retry the request', () => {
