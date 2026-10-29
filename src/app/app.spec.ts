@@ -34,7 +34,7 @@ describe('App', () => {
 
     expect(harness.routeNativeElement?.querySelector('app-dataset-list')).not.toBeNull();
 
-    expect(harness.routeNativeElement?.textContent).toContain('Catálogo pendiente de integración');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain('Datasets');
   });
 
   it('should navigate to the Models and Experiments placeholders', async () => {

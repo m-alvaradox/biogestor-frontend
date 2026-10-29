@@ -48,14 +48,60 @@
         </thead>
 
         <tbody>
-          <tr>
-            <td colspan="6" class="empty-state">
-              <div class="empty-state-content">
-                <h2>Catálogo pendiente de integración</h2>
-                <p>Los datasets se mostrarán aquí cuando se implemente la conexión con la API.</p>
-              </div>
-            </td>
-          </tr>
+          @if (loading()) {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-content">
+                  <p>Cargando datasets...</p>
+                </div>
+              </td>
+            </tr>
+          } @else if (error()) {
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-content">
+                  <h2>{{ error() }}</h2>
+                  <button type="button" class="btn-primary" (click)="load()">Reintentar</button>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (dataset of datasets(); track dataset.id) {
+              <tr>
+                <td>{{ dataset.name }}</td>
+                <td>
+                  <span class="badge badge-type">{{ typeLabels[dataset.type] }}</span>
+                </td>
+
+                <!-- Cambiar cuando exista data de Usuarios. -->
+                <td>{{ dataset.owner ?? '—' }}</td>
+                <!-- Actualmente solo muestra el ID si esta disponible '-' si no. -->
+
+                <td>{{ dataset.created_at | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  <span [class]="'badge badge-' + dataset.status">
+                    {{ statusLabels[dataset.status] }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button type="button" class="action action-view">Ver</button>
+                    <button type="button" class="action action-edit">Editar</button>
+                    <button type="button" class="action action-delete">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-content">
+                    <h2>No hay datasets registrados</h2>
+                    <p>Los datasets aparecerán aquí cuando se registren en BioGestor.</p>
+                  </div>
+                </td>
+              </tr>
+            }
+          }
         </tbody>
       </table>
     </div>
