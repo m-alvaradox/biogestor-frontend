@@ -19,6 +19,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/datasets/pages/dataset-list/dataset-list').then((m) => m.DatasetList),
       },
+      {
+        path: 'datasets/:id',
+        loadComponent: () =>
+          import('./features/datasets/pages/dataset-detail/dataset-detail').then(
+            (m) => m.DatasetDetailPage,
+          ),
+      },
 
       {
         path: 'integrations',
