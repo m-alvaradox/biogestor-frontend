@@ -112,6 +112,8 @@ src/app/
 
 Además, `src/styles.scss` define clases globales para los elementos que se repiten entre pantallas: `.page-header` (título `h1` y descripción), `.card` (borde, radio y fondo de tarjeta) y los botones `.btn-primary`, `.btn-secondary` y `.btn-danger`. Cada componente agrega a esas clases solo su distribución propia (por ejemplo, el `padding` de cada tarjeta).
 
+Las fuentes son las del prototipo y se sirven desde el propio proyecto, sin peticiones a terceros: Plus Jakarta Sans para el texto (`--font-family-base`) y JetBrains Mono para `code` (`--font-family-mono`). Los archivos `.woff2` (subconjunto latino) y sus licencias SIL Open Font License están en `public/fonts/` y se declaran con `@font-face` en `src/styles.scss`.
+
 ## Compilación
 
 ```bash

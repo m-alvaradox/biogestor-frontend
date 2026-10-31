@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/plus-jakarta-sans-latin.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/jetbrains-mono-latin-400.woff2') format('woff2');
+}
+
 *,
 *::before,
 *::after {
@@ -37,13 +53,20 @@
   --radius-pill: 999px;
 
   --page-max-width: 1600px;
+
+  --font-family-base: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: var(--font-family-base);
   color: var(--color-text);
   background: var(--color-bg);
+}
+
+code {
+  font-family: var(--font-family-mono);
 }
 
 .page-header {
