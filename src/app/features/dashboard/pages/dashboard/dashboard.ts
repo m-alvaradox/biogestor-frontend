@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { StatCard } from '../../../../shared/ui/stat-card/stat-card';
+import { DashboardStat } from '../../models/dashboard-stat';
 
 @Component({
   selector: 'app-dashboard',
@@ -8,7 +9,7 @@ import { StatCard } from '../../../../shared/ui/stat-card/stat-card';
   styleUrl: './dashboard.scss',
 })
 export class Dashboard {
-  readonly stats = [
+  readonly stats: DashboardStat[] = [
     {
       label: 'Datasets',
       value: 42,
