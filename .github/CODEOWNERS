@@ -1,0 +1,11 @@
+# Código general del frontend
+* @m-alvaradox @AndreewCore
+
+# Arquitectura y configuración Angular
+/angular.json @m-alvaradox @Anlaye22
+/tsconfig*.json @m-alvaradox @Anlaye22
+
+# DevOps y automatización
+/.github/ @Anlaye22 @SpaceStar26
+/Dockerfile @Anlaye22 @SpaceStar26
+/docker-compose*.yml @Anlaye22 @SpaceStar26
