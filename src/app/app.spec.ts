@@ -21,6 +21,9 @@ describe('App', () => {
 
   it('should redirect the root route to the dashboard', async () => {
     const harness = await RouterTestingHarness.create('/');
+    const router = TestBed.inject(Router);
+
+    expect(router.url).toBe('/dashboard');
 
     expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toContain(
       'Panel principal',
