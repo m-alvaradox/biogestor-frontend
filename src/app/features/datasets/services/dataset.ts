@@ -1,7 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DatasetDetail, DatasetPage } from '../models/dataset';
+import {
+  DatasetCreatePayload,
+  DatasetCreated,
+  DatasetDetail,
+  DatasetPage,
+} from '../models/dataset';
 
 const DATASETS_URL = '/api/v1/datasets/';
 
@@ -15,5 +20,9 @@ export class DatasetService {
 
   get(id: number): Observable<DatasetDetail> {
     return this.http.get<DatasetDetail>(`${DATASETS_URL}${id}/`);
+  }
+
+  create(payload: DatasetCreatePayload): Observable<DatasetCreated> {
+    return this.http.post<DatasetCreated>(DATASETS_URL, payload);
   }
 }

@@ -192,14 +192,21 @@ describe('DatasetList', () => {
     expect(rows().length).toBe(3);
   });
 
+  it('should link the new dataset button to the registration form', () => {
+    respond(emptyPage);
+
+    const createLink = fixture.nativeElement.querySelector('.new-dataset');
+
+    expect(createLink.getAttribute('href')).toBe('/datasets/new');
+    expect(fixture.nativeElement.querySelector('.success-message')).toBeNull();
+  });
+
   it('should keep unavailable controls disabled', () => {
     respond(emptyPage);
 
-    const createButton = fixture.nativeElement.querySelector('.btn-primary');
     const searchInput = fixture.nativeElement.querySelector('.search-input');
     const typeFilter = fixture.nativeElement.querySelector('.type-filter');
 
-    expect(createButton.disabled).toBe(true);
     expect(searchInput.disabled).toBe(true);
     expect(typeFilter.disabled).toBe(true);
   });

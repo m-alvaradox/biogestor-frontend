@@ -6,15 +6,14 @@
       <p>Registra y administra datasets de cualquier tipo.</p>
     </div>
 
-    <button
-      type="button"
-      class="btn-primary"
-      disabled
-      title="El registro de datasets estará disponible próximamente"
-    >
-      + Nuevo conjunto
-    </button>
+    <a routerLink="/datasets/new" class="btn-primary new-dataset">+ Nuevo conjunto</a>
   </header>
+
+  @if (createdDataset) {
+    <p class="success-message" role="status">
+      Dataset "{{ createdDataset }}" registrado correctamente.
+    </p>
+  }
 
   <!-- Catálogo de datasets -->
   <section class="card catalog-card" aria-label="Catálogo de datasets">

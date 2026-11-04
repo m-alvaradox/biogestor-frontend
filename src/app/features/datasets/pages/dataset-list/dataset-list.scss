@@ -16,6 +16,20 @@
   gap: 24px;
 }
 
+.new-dataset {
+  text-decoration: none;
+}
+
+.success-message {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-control);
+  background: var(--color-success-bg);
+  color: var(--color-success-text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .catalog-card {
   overflow: hidden;
 }
