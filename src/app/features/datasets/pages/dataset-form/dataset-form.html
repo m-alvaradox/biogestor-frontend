@@ -44,15 +44,13 @@
           </div>
 
           <div class="field">
-            <label for="status">Estado</label>
-            <select id="status" formControlName="status" [class.invalid]="errorFor('status')">
-              @for (option of statusOptions; track option[0]) {
-                <option [value]="option[0]">{{ option[1] }}</option>
-              }
+            <label for="owner">Investigador responsable</label>
+            <select id="owner" disabled aria-describedby="owner-hint">
+              <option selected>Pendiente</option>
             </select>
-            @if (errorFor('status'); as message) {
-              <p class="field-error">{{ message }}</p>
-            }
+            <p id="owner-hint" class="field-hint">
+              Disponible cuando el backend exponga la lista de usuarios.
+            </p>
           </div>
         </div>
 
@@ -218,6 +216,22 @@
     </div>
 
     <aside class="form-side">
+      <section class="card form-card" aria-labelledby="status-title">
+        <h2 id="status-title">Estado</h2>
+
+        <div class="field">
+          <label for="status">Estado inicial</label>
+          <select id="status" formControlName="status" [class.invalid]="errorFor('status')">
+            @for (option of statusOptions; track option[0]) {
+              <option [value]="option[0]">{{ option[1] }}</option>
+            }
+          </select>
+          @if (errorFor('status'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
       <section class="card form-card actions-card" aria-label="Acciones del formulario">
         <p class="hint">Los campos con <span class="required">*</span> son obligatorios.</p>
 

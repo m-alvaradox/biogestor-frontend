@@ -64,6 +64,13 @@ describe('DatasetForm', () => {
     expect(component.form.controls.status.value).toBe('active');
   });
 
+  it('should show the responsible researcher as pending and disabled', () => {
+    const owner = element<HTMLSelectElement>('#owner');
+
+    expect(owner.disabled).toBe(true);
+    expect(owner.selectedOptions[0].textContent?.trim()).toBe('Pendiente');
+  });
+
   it('should not send the form and show errors when required fields are empty', () => {
     submit();
 
