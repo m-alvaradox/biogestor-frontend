@@ -98,6 +98,7 @@ describe('DatasetService', () => {
       pool: null,
       capture_date: null,
       license: null,
+      type_metadata: { microphone: 'Hidrófono genérico', sample_rate: 44100 },
       storage: { s3_uri: null, file_format: null, size_bytes: null, file_count: null },
     };
     const created: DatasetCreated = {
@@ -105,7 +106,6 @@ describe('DatasetService', () => {
       id: 9,
       owner: null,
       created_at: '2026-11-04T10:00:00Z',
-      type_metadata: null,
     };
     let response: DatasetCreated | undefined;
 

@@ -49,6 +49,7 @@ export interface DatasetCreatePayload {
   pool: string | null;
   capture_date: string | null;
   license: string | null;
+  type_metadata: Record<string, unknown> | null;
   storage: DatasetStorage;
 }
 
@@ -57,5 +58,4 @@ export interface DatasetCreated extends Omit<DatasetCreatePayload, 'status'> {
   status: DatasetStatus | null;
   owner: number | null;
   created_at: string;
-  type_metadata: Record<string, unknown> | null;
 }

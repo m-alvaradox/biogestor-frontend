@@ -112,6 +112,7 @@ describe('DatasetForm', () => {
       pool: null,
       capture_date: null,
       license: null,
+      type_metadata: null,
       storage: {
         s3_uri: 's3://biogestor-data/audio/002/',
         file_format: null,

@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import {
   AbstractControl,
+  FormControl,
+  FormGroup,
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -10,6 +12,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { DATASET_STATUS_LABELS, DATASET_TYPE_LABELS } from '../../models/dataset-labels';
 import { DatasetCreatePayload, DatasetStatus, DatasetType } from '../../models/dataset';
+import { TYPE_METADATA_FIELDS, TypeMetadataField } from '../../models/dataset-type-metadata';
 import { DatasetService } from '../../services/dataset';
 
 type FieldName =
@@ -26,6 +29,13 @@ type FieldName =
   | 'file_format'
   | 'size_bytes'
   | 'file_count';
+
+type TypeFieldValue = string | number | null;
+
+type CustomFieldGroup = FormGroup<{
+  key: FormControl<string>;
+  value: FormControl<string>;
+}>;
 
 const STORAGE_FIELDS: FieldName[] = ['s3_uri', 'file_format', 'size_bytes', 'file_count'];
 
@@ -46,9 +56,33 @@ function nonNegativeInteger(control: AbstractControl<number | null>): Validation
     : { nonNegativeInteger: true };
 }
 
+function positiveNumber(control: AbstractControl<TypeFieldValue>): ValidationErrors | null {
+  const value = control.value;
+  return value === null || value === '' || (typeof value === 'number' && value > 0)
+    ? null
+    : { positiveNumber: true };
+}
+
 function textOrNull(value: string): string | null {
   const trimmed = value.trim();
   return trimmed === '' ? null : trimmed;
+}
+
+function typeFieldValue(field: TypeMetadataField, raw: TypeFieldValue): unknown {
+  if (raw === null || raw === '') {
+    return null;
+  }
+  if (field.kind === 'number') {
+    return Number(raw);
+  }
+  if (field.kind === 'list') {
+    const items = `${raw}`
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item !== '');
+    return items.length > 0 ? items : null;
+  }
+  return textOrNull(`${raw}`);
 }
 
 @Component({
@@ -60,6 +94,7 @@ function textOrNull(value: string): string | null {
 export class DatasetForm {
   private readonly datasetService = inject(DatasetService);
   private readonly router = inject(Router);
+  private readonly fb = inject(NonNullableFormBuilder);
 
   readonly typeOptions = Object.entries(DATASET_TYPE_LABELS) as [DatasetType, string][];
   readonly statusOptions = Object.entries(DATASET_STATUS_LABELS) as [DatasetStatus, string][];
@@ -68,8 +103,11 @@ export class DatasetForm {
   readonly saving = signal(false);
   readonly submitError = signal('');
   readonly serverErrors = signal<Partial<Record<FieldName, string>>>({});
+  readonly typeFields = signal<TypeMetadataField[]>([]);
 
-  readonly form = inject(NonNullableFormBuilder).group({
+  private readonly typeFieldControls = this.fb.record<FormControl<TypeFieldValue>>({});
+
+  readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(150)]],
     type: ['' as DatasetType | '', Validators.required],
     status: ['active' as DatasetStatus],
@@ -83,9 +121,19 @@ export class DatasetForm {
     file_format: ['', Validators.maxLength(30)],
     size_bytes: [null as number | null, nonNegativeInteger],
     file_count: [null as number | null, nonNegativeInteger],
+    type_fields: this.typeFieldControls,
+    custom_fields: this.fb.array<CustomFieldGroup>([]),
   });
 
   constructor() {
+    this.form.controls.custom_fields.addValidators(() =>
+      this.form.controls.custom_fields.controls.some((_, index) => this.customFieldIssue(index))
+        ? { customFields: true }
+        : null,
+    );
+
+    this.form.controls.type.valueChanges.subscribe((type) => this.applyType(type));
+
     this.form.valueChanges.subscribe(() => {
       if (Object.keys(this.serverErrors()).length > 0) {
         this.serverErrors.set({});
@@ -116,6 +164,33 @@ export class DatasetForm {
       return 'Debe ser un número entero mayor o igual a 0.';
     }
     return 'Valor no válido.';
+  }
+
+  typeLabel(): string {
+    const type = this.form.controls.type.value;
+    return type ? DATASET_TYPE_LABELS[type] : '';
+  }
+
+  typeFieldError(key: string): string {
+    const control = this.typeFieldControls.controls[key];
+
+    if (!control || !control.invalid || !(control.touched || control.dirty)) {
+      return '';
+    }
+    return 'Debe ser un número mayor que 0.';
+  }
+
+  addCustomField(): void {
+    this.form.controls.custom_fields.push(this.fb.group({ key: [''], value: [''] }));
+  }
+
+  removeCustomField(index: number): void {
+    this.form.controls.custom_fields.removeAt(index);
+  }
+
+  customFieldError(index: number): string {
+    const row = this.form.controls.custom_fields.at(index);
+    return row.touched || row.dirty ? this.customFieldIssue(index) : '';
   }
 
   save(): void {
@@ -154,6 +229,7 @@ export class DatasetForm {
       pool: textOrNull(value.pool),
       capture_date: value.capture_date || null,
       license: textOrNull(value.license),
+      type_metadata: this.buildTypeMetadata(),
       storage: {
         s3_uri: textOrNull(value.s3_uri),
         file_format: textOrNull(value.file_format),
@@ -161,6 +237,65 @@ export class DatasetForm {
         file_count: value.file_count,
       },
     };
+  }
+
+  private applyType(type: DatasetType | ''): void {
+    const fields = type ? TYPE_METADATA_FIELDS[type] : [];
+    const group = this.typeFieldControls;
+
+    for (const key of Object.keys(group.controls)) {
+      group.removeControl(key);
+    }
+    for (const field of fields) {
+      group.addControl(
+        field.key,
+        this.fb.control<TypeFieldValue>(
+          field.kind === 'number' ? null : '',
+          field.kind === 'number' ? positiveNumber : null,
+        ),
+      );
+    }
+
+    this.typeFields.set(fields);
+    this.form.controls.custom_fields.updateValueAndValidity();
+  }
+
+  private customFieldIssue(index: number): string {
+    const rows = this.form.controls.custom_fields.getRawValue();
+    const key = rows[index]?.key.trim() ?? '';
+    const value = rows[index]?.value.trim() ?? '';
+
+    if (key === '') {
+      return value === '' ? '' : 'Indica el nombre del campo.';
+    }
+    if (this.typeFields().some((field) => field.key === key)) {
+      return 'Este campo ya tiene su propia casilla arriba.';
+    }
+    if (rows.findIndex((row) => row.key.trim() === key) !== index) {
+      return 'Este campo ya está en la lista.';
+    }
+    return '';
+  }
+
+  private buildTypeMetadata(): Record<string, unknown> | null {
+    const metadata: Record<string, unknown> = {};
+    const values = this.typeFieldControls.getRawValue();
+
+    for (const field of this.typeFields()) {
+      const value = typeFieldValue(field, values[field.key] ?? null);
+      if (value !== null) {
+        metadata[field.key] = value;
+      }
+    }
+    for (const row of this.form.controls.custom_fields.getRawValue()) {
+      const key = row.key.trim();
+      const value = row.value.trim();
+      if (key !== '' && value !== '') {
+        metadata[key] = value;
+      }
+    }
+
+    return Object.keys(metadata).length > 0 ? metadata : null;
   }
 
   private handleError(error: HttpErrorResponse): void {

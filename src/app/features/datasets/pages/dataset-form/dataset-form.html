@@ -145,6 +145,84 @@
             <p class="field-error">{{ message }}</p>
           }
         </div>
+
+        @if (typeFields().length > 0) {
+          <div class="metadata-group" formGroupName="type_fields">
+            <h3>Datos de {{ typeLabel() }}</h3>
+
+            <div class="field-row">
+              @for (field of typeFields(); track field.key) {
+                <div class="field">
+                  <label [for]="'meta-' + field.key">{{ field.label }}</label>
+                  @if (field.kind === 'number') {
+                    <input
+                      [id]="'meta-' + field.key"
+                      type="number"
+                      min="0"
+                      step="any"
+                      [formControlName]="field.key"
+                      [placeholder]="field.placeholder"
+                      [class.invalid]="typeFieldError(field.key)"
+                    />
+                  } @else {
+                    <input
+                      [id]="'meta-' + field.key"
+                      type="text"
+                      [formControlName]="field.key"
+                      [placeholder]="field.placeholder"
+                    />
+                  }
+                  @if (field.kind === 'list') {
+                    <p class="field-hint">Separa los valores con comas.</p>
+                  }
+                  @if (typeFieldError(field.key); as message) {
+                    <p class="field-error">{{ message }}</p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="metadata-group" formArrayName="custom_fields">
+          <h3>Campos adicionales</h3>
+          <p class="field-hint">Agrega otros datos del conjunto como pares campo: valor.</p>
+
+          @for (row of form.controls.custom_fields.controls; track row; let i = $index) {
+            <div class="custom-field" [formGroupName]="i">
+              <div class="custom-field-inputs">
+                <input
+                  type="text"
+                  formControlName="key"
+                  placeholder="Campo"
+                  [attr.aria-label]="'Nombre del campo adicional ' + (i + 1)"
+                  [class.invalid]="customFieldError(i)"
+                />
+                <input
+                  type="text"
+                  formControlName="value"
+                  placeholder="Valor"
+                  [attr.aria-label]="'Valor del campo adicional ' + (i + 1)"
+                />
+                <button
+                  type="button"
+                  class="btn-link-danger"
+                  (click)="removeCustomField(i)"
+                  [attr.aria-label]="'Quitar el campo adicional ' + (i + 1)"
+                >
+                  Quitar
+                </button>
+              </div>
+              @if (customFieldError(i); as message) {
+                <p class="field-error">{{ message }}</p>
+              }
+            </div>
+          }
+
+          <button type="button" class="btn-add-field" (click)="addCustomField()">
+            + Agregar campo
+          </button>
+        </div>
       </section>
 
       <section class="card form-card" aria-labelledby="storage-title">
