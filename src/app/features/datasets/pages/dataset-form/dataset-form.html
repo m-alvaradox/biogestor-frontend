@@ -45,12 +45,28 @@
 
           <div class="field">
             <label for="owner">Investigador responsable</label>
-            <select id="owner" disabled aria-describedby="owner-hint">
-              <option selected>Pendiente</option>
+            <select
+              id="owner"
+              formControlName="owner"
+              aria-describedby="owner-hint"
+              [class.invalid]="errorFor('owner')"
+            >
+              <option [ngValue]="null">
+                {{ ownersState() === 'loading' ? 'Cargando investigadores...' : 'Sin asignar' }}
+              </option>
+              @for (owner of owners(); track owner.id) {
+                <option [ngValue]="owner.id">{{ owner.name }}</option>
+              }
             </select>
-            <p id="owner-hint" class="field-hint">
-              Disponible cuando el backend exponga la lista de usuarios.
-            </p>
+            @if (errorFor('owner'); as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else if (ownersState() === 'error') {
+              <p id="owner-hint" class="field-hint">
+                No se pudo cargar la lista de investigadores.
+              </p>
+            } @else if (ownersState() === 'ready' && owners().length === 0) {
+              <p id="owner-hint" class="field-hint">No hay investigadores activos registrados.</p>
+            }
           </div>
         </div>
 

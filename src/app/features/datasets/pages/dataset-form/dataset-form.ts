@@ -11,9 +11,15 @@ import {
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { DATASET_STATUS_LABELS, DATASET_TYPE_LABELS } from '../../models/dataset-labels';
-import { DatasetCreatePayload, DatasetStatus, DatasetType } from '../../models/dataset';
+import {
+  DatasetCreatePayload,
+  DatasetOwner,
+  DatasetStatus,
+  DatasetType,
+} from '../../models/dataset';
 import { TYPE_METADATA_FIELDS, TypeMetadataField } from '../../models/dataset-type-metadata';
 import { DatasetService } from '../../services/dataset';
+import { UserService } from '../../../users/services/user';
 
 type FieldName =
   | 'name'
@@ -25,6 +31,7 @@ type FieldName =
   | 'pool'
   | 'capture_date'
   | 'license'
+  | 'owner'
   | 's3_uri'
   | 'file_format'
   | 'size_bytes'
@@ -93,6 +100,7 @@ function typeFieldValue(field: TypeMetadataField, raw: TypeFieldValue): unknown 
 })
 export class DatasetForm {
   private readonly datasetService = inject(DatasetService);
+  private readonly userService = inject(UserService);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
 
@@ -104,6 +112,8 @@ export class DatasetForm {
   readonly submitError = signal('');
   readonly serverErrors = signal<Partial<Record<FieldName, string>>>({});
   readonly typeFields = signal<TypeMetadataField[]>([]);
+  readonly owners = signal<DatasetOwner[]>([]);
+  readonly ownersState = signal<'loading' | 'ready' | 'error'>('loading');
 
   private readonly typeFieldControls = this.fb.record<FormControl<TypeFieldValue>>({});
 
@@ -117,6 +127,7 @@ export class DatasetForm {
     pool: ['', Validators.maxLength(50)],
     capture_date: ['', notFutureDate],
     license: ['', Validators.maxLength(100)],
+    owner: [{ value: null as number | null, disabled: true }],
     s3_uri: ['', Validators.maxLength(1024)],
     file_format: ['', Validators.maxLength(30)],
     size_bytes: [null as number | null, nonNegativeInteger],
@@ -133,6 +144,8 @@ export class DatasetForm {
     );
 
     this.form.controls.type.valueChanges.subscribe((type) => this.applyType(type));
+
+    this.loadOwners();
 
     this.form.valueChanges.subscribe(() => {
       if (Object.keys(this.serverErrors()).length > 0) {
@@ -229,6 +242,7 @@ export class DatasetForm {
       pool: textOrNull(value.pool),
       capture_date: value.capture_date || null,
       license: textOrNull(value.license),
+      owner: value.owner,
       type_metadata: this.buildTypeMetadata(),
       storage: {
         s3_uri: textOrNull(value.s3_uri),
@@ -237,6 +251,17 @@ export class DatasetForm {
         file_count: value.file_count,
       },
     };
+  }
+
+  private loadOwners(): void {
+    this.userService.list().subscribe({
+      next: (owners) => {
+        this.owners.set(owners);
+        this.ownersState.set('ready');
+        this.form.controls.owner.enable();
+      },
+      error: () => this.ownersState.set('error'),
+    });
   }
 
   private applyType(type: DatasetType | ''): void {

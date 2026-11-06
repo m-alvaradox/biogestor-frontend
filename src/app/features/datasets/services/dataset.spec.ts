@@ -98,13 +98,13 @@ describe('DatasetService', () => {
       pool: null,
       capture_date: null,
       license: null,
+      owner: 2,
       type_metadata: { microphone: 'Hidrófono genérico', sample_rate: 44100 },
       storage: { s3_uri: null, file_format: null, size_bytes: null, file_count: null },
     };
     const created: DatasetCreated = {
       ...payload,
       id: 9,
-      owner: null,
       created_at: '2026-11-04T10:00:00Z',
     };
     let response: DatasetCreated | undefined;

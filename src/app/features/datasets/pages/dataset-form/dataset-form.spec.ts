@@ -1,5 +1,9 @@
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  TestRequest,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
@@ -10,6 +14,7 @@ describe('DatasetForm', () => {
   let component: DatasetForm;
   let http: HttpTestingController;
   let router: Router;
+  let ownersRequest: TestRequest;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -23,6 +28,7 @@ describe('DatasetForm', () => {
     router = TestBed.inject(Router);
     vi.spyOn(router, 'navigate').mockResolvedValue(true);
     fixture.detectChanges();
+    ownersRequest = http.expectOne('/api/v1/users/');
   });
 
   afterEach(() => {
@@ -35,6 +41,14 @@ describe('DatasetForm', () => {
 
   function submit(): void {
     element<HTMLFormElement>('form').dispatchEvent(new Event('submit'));
+    fixture.detectChanges();
+  }
+
+  function loadOwners(): void {
+    ownersRequest.flush([
+      { id: 2, name: 'Dra. Ana Lima' },
+      { id: 3, name: 'Ing. Carlos Mora' },
+    ]);
     fixture.detectChanges();
   }
 
@@ -64,11 +78,60 @@ describe('DatasetForm', () => {
     expect(component.form.controls.status.value).toBe('active');
   });
 
-  it('should show the responsible researcher as pending and disabled', () => {
+  it('should keep the researcher select disabled while the users load', () => {
     const owner = element<HTMLSelectElement>('#owner');
 
+    expect(ownersRequest.request.method).toBe('GET');
     expect(owner.disabled).toBe(true);
-    expect(owner.selectedOptions[0].textContent?.trim()).toBe('Pendiente');
+    expect(owner.selectedOptions[0].textContent?.trim()).toBe('Cargando investigadores...');
+  });
+
+  it('should list the active users as researchers once they load', () => {
+    loadOwners();
+
+    const owner = element<HTMLSelectElement>('#owner');
+    const options = Array.from(owner.options).map((option) => option.textContent?.trim());
+
+    expect(owner.disabled).toBe(false);
+    expect(options).toEqual(['Sin asignar', 'Dra. Ana Lima', 'Ing. Carlos Mora']);
+    expect(component.form.controls.owner.value).toBeNull();
+  });
+
+  it('should tell the user when there are no active researchers', () => {
+    ownersRequest.flush([]);
+    fixture.detectChanges();
+
+    expect(element('#owner-hint').textContent).toContain('No hay investigadores activos');
+  });
+
+  it('should disable the researcher select and still save when the users fail to load', () => {
+    ownersRequest.flush(null, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    expect(element<HTMLSelectElement>('#owner').disabled).toBe(true);
+    expect(element('#owner-hint').textContent).toContain(
+      'No se pudo cargar la lista de investigadores.',
+    );
+
+    fillRequired();
+    submit();
+
+    const request = http.expectOne('/api/v1/datasets/');
+    expect(request.request.body.owner).toBeNull();
+    request.flush({ id: 9, name: 'Lote de audio de tilapia 002' });
+  });
+
+  it('should send the selected researcher id as owner', () => {
+    loadOwners();
+    fillRequired();
+    const owner = element<HTMLSelectElement>('#owner');
+    owner.value = owner.options[2].value;
+    owner.dispatchEvent(new Event('change'));
+    submit();
+
+    const request = http.expectOne('/api/v1/datasets/');
+    expect(request.request.body.owner).toBe(3);
+    request.flush({ id: 9, name: 'Lote de audio de tilapia 002' });
   });
 
   it('should not send the form and show errors when required fields are empty', () => {
@@ -112,6 +175,7 @@ describe('DatasetForm', () => {
       pool: null,
       capture_date: null,
       license: null,
+      owner: null,
       type_metadata: null,
       storage: {
         s3_uri: 's3://biogestor-data/audio/002/',
@@ -136,6 +200,7 @@ describe('DatasetForm', () => {
     http.expectOne('/api/v1/datasets/').flush(
       {
         name: ['Asegúrese de que este campo no tenga más de 150 caracteres.'],
+        owner: ['Clave primaria "99" inválida - objeto no existe.'],
         storage: { s3_uri: ['Referencia no válida.'] },
         __all__: ['Ya existe un dataset con esta referencia de S3.'],
       },
@@ -147,6 +212,7 @@ describe('DatasetForm', () => {
       'Asegúrese de que este campo no tenga más de 150 caracteres.',
     );
     expect(component.errorFor('s3_uri')).toBe('Referencia no válida.');
+    expect(component.errorFor('owner')).toBe('Clave primaria "99" inválida - objeto no existe.');
     expect(element('.submit-error').textContent).toContain(
       'Ya existe un dataset con esta referencia de S3.',
     );
