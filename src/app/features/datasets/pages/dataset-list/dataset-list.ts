@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DatasetStatusBadge } from '../../components/dataset-status-badge/dataset-status-badge';
 import { DatasetTypeBadge } from '../../components/dataset-type-badge/dataset-type-badge';
 import { Dataset } from '../../models/dataset';
@@ -14,6 +14,9 @@ import { DatasetService } from '../../services/dataset';
 })
 export class DatasetList implements OnInit {
   private readonly datasetService = inject(DatasetService);
+
+  readonly createdDataset: string | undefined =
+    inject(Router).currentNavigation()?.extras.state?.['createdDataset'];
 
   readonly datasets = signal<Dataset[]>([]);
   readonly loading = signal(false);

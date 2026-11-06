@@ -1,0 +1,343 @@
+<section class="form-page">
+  <nav class="breadcrumb" aria-label="Ruta de navegación">
+    <a routerLink="/datasets">Conjuntos de datos</a>
+    <span aria-hidden="true">›</span>
+    <span aria-current="page">Registrar nuevo conjunto</span>
+  </nav>
+
+  <header class="page-header">
+    <h1>Registrar nuevo conjunto</h1>
+    <p>Completa los metadatos para registrar un nuevo conjunto en BioGestor.</p>
+  </header>
+
+  <form class="form-layout" [formGroup]="form" (ngSubmit)="save()" novalidate>
+    <div class="form-main">
+      <section class="card form-card" aria-labelledby="basic-title">
+        <h2 id="basic-title">Información básica</h2>
+
+        <div class="field">
+          <label for="name">Nombre del conjunto <span class="required">*</span></label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Ej.: Lote de audio de tilapia 002"
+            [class.invalid]="errorFor('name')"
+          />
+          @if (errorFor('name'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="type">Tipo de dataset <span class="required">*</span></label>
+            <select id="type" formControlName="type" [class.invalid]="errorFor('type')">
+              <option value="" disabled>Selecciona un tipo...</option>
+              @for (option of typeOptions; track option[0]) {
+                <option [value]="option[0]">{{ option[1] }}</option>
+              }
+            </select>
+            @if (errorFor('type'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="owner">Investigador responsable</label>
+            <select
+              id="owner"
+              formControlName="owner"
+              aria-describedby="owner-hint"
+              [class.invalid]="errorFor('owner')"
+            >
+              <option [ngValue]="null">
+                {{ ownersState() === 'loading' ? 'Cargando investigadores...' : 'Sin asignar' }}
+              </option>
+              @for (owner of owners(); track owner.id) {
+                <option [ngValue]="owner.id">{{ owner.name }}</option>
+              }
+            </select>
+            @if (errorFor('owner'); as message) {
+              <p class="field-error">{{ message }}</p>
+            } @else if (ownersState() === 'error') {
+              <p id="owner-hint" class="field-hint">
+                No se pudo cargar la lista de investigadores.
+              </p>
+            } @else if (ownersState() === 'ready' && owners().length === 0) {
+              <p id="owner-hint" class="field-hint">No hay investigadores activos registrados.</p>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="description">Descripción</label>
+          <textarea
+            id="description"
+            rows="4"
+            formControlName="description"
+            placeholder="Describe el contenido, las condiciones de registro, el propósito y cualquier nota relevante..."
+            [class.invalid]="errorFor('description')"
+          ></textarea>
+          @if (errorFor('description'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="card form-card" aria-labelledby="metadata-title">
+        <h2 id="metadata-title">Metadatos</h2>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="species">Especie</label>
+            <input
+              id="species"
+              type="text"
+              formControlName="species"
+              placeholder="Ej.: Tilapia"
+              [class.invalid]="errorFor('species')"
+            />
+            @if (errorFor('species'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="farm">Camaronera / granja</label>
+            <input
+              id="farm"
+              type="text"
+              formControlName="farm"
+              placeholder="Ej.: Granja Norte"
+              [class.invalid]="errorFor('farm')"
+            />
+            @if (errorFor('farm'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="pool">Piscina</label>
+            <input
+              id="pool"
+              type="text"
+              formControlName="pool"
+              placeholder="Ej.: P-01"
+              [class.invalid]="errorFor('pool')"
+            />
+            @if (errorFor('pool'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="capture_date">Fecha de captura</label>
+            <input
+              id="capture_date"
+              type="date"
+              formControlName="capture_date"
+              [max]="maxDate"
+              [class.invalid]="errorFor('capture_date')"
+            />
+            @if (errorFor('capture_date'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="license">Licencia</label>
+          <input
+            id="license"
+            type="text"
+            formControlName="license"
+            placeholder="Ej.: CC BY 4.0"
+            [class.invalid]="errorFor('license')"
+          />
+          @if (errorFor('license'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        @if (typeFields().length > 0) {
+          <div class="metadata-group" formGroupName="type_fields">
+            <h3>Datos de {{ typeLabel() }}</h3>
+
+            <div class="field-row">
+              @for (field of typeFields(); track field.key) {
+                <div class="field">
+                  <label [for]="'meta-' + field.key">{{ field.label }}</label>
+                  @if (field.kind === 'number') {
+                    <input
+                      [id]="'meta-' + field.key"
+                      type="number"
+                      min="0"
+                      step="any"
+                      [formControlName]="field.key"
+                      [placeholder]="field.placeholder"
+                      [class.invalid]="typeFieldError(field.key)"
+                    />
+                  } @else {
+                    <input
+                      [id]="'meta-' + field.key"
+                      type="text"
+                      [formControlName]="field.key"
+                      [placeholder]="field.placeholder"
+                    />
+                  }
+                  @if (field.kind === 'list') {
+                    <p class="field-hint">Separa los valores con comas.</p>
+                  }
+                  @if (typeFieldError(field.key); as message) {
+                    <p class="field-error">{{ message }}</p>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="metadata-group" formArrayName="custom_fields">
+          <h3>Campos adicionales</h3>
+          <p class="field-hint">Agrega otros datos del conjunto como pares campo: valor.</p>
+
+          @for (row of form.controls.custom_fields.controls; track row; let i = $index) {
+            <div class="custom-field" [formGroupName]="i">
+              <div class="custom-field-inputs">
+                <input
+                  type="text"
+                  formControlName="key"
+                  placeholder="Campo"
+                  [attr.aria-label]="'Nombre del campo adicional ' + (i + 1)"
+                  [class.invalid]="customFieldError(i)"
+                />
+                <input
+                  type="text"
+                  formControlName="value"
+                  placeholder="Valor"
+                  [attr.aria-label]="'Valor del campo adicional ' + (i + 1)"
+                />
+                <button
+                  type="button"
+                  class="btn-link-danger"
+                  (click)="removeCustomField(i)"
+                  [attr.aria-label]="'Quitar el campo adicional ' + (i + 1)"
+                >
+                  Quitar
+                </button>
+              </div>
+              @if (customFieldError(i); as message) {
+                <p class="field-error">{{ message }}</p>
+              }
+            </div>
+          }
+
+          <button type="button" class="btn-add-field" (click)="addCustomField()">
+            + Agregar campo
+          </button>
+        </div>
+      </section>
+
+      <section class="card form-card" aria-labelledby="storage-title">
+        <h2 id="storage-title">Almacenamiento</h2>
+
+        <div class="field">
+          <label for="s3_uri">Referencia en S3</label>
+          <input
+            id="s3_uri"
+            type="text"
+            class="mono"
+            formControlName="s3_uri"
+            placeholder="s3://biogestor-data/audio/lote-002/"
+            [class.invalid]="errorFor('s3_uri')"
+          />
+          @if (errorFor('s3_uri'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+
+        <div class="field-row field-row-3">
+          <div class="field">
+            <label for="file_format">Formato</label>
+            <input
+              id="file_format"
+              type="text"
+              formControlName="file_format"
+              placeholder="Ej.: .WAV"
+              [class.invalid]="errorFor('file_format')"
+            />
+            @if (errorFor('file_format'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="size_bytes">Tamaño (bytes)</label>
+            <input
+              id="size_bytes"
+              type="number"
+              min="0"
+              step="1"
+              formControlName="size_bytes"
+              placeholder="Ej.: 1048576"
+              [class.invalid]="errorFor('size_bytes')"
+            />
+            @if (errorFor('size_bytes'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+
+          <div class="field">
+            <label for="file_count">Número de archivos</label>
+            <input
+              id="file_count"
+              type="number"
+              min="0"
+              step="1"
+              formControlName="file_count"
+              placeholder="Ej.: 120"
+              [class.invalid]="errorFor('file_count')"
+            />
+            @if (errorFor('file_count'); as message) {
+              <p class="field-error">{{ message }}</p>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="form-side">
+      <section class="card form-card" aria-labelledby="status-title">
+        <h2 id="status-title">Estado</h2>
+
+        <div class="field">
+          <label for="status">Estado inicial</label>
+          <select id="status" formControlName="status" [class.invalid]="errorFor('status')">
+            @for (option of statusOptions; track option[0]) {
+              <option [value]="option[0]">{{ option[1] }}</option>
+            }
+          </select>
+          @if (errorFor('status'); as message) {
+            <p class="field-error">{{ message }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="card form-card actions-card" aria-label="Acciones del formulario">
+        <p class="hint">Los campos con <span class="required">*</span> son obligatorios.</p>
+
+        @if (submitError()) {
+          <p class="submit-error" role="alert">{{ submitError() }}</p>
+        }
+
+        <button type="submit" class="btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Guardando...' : 'Guardar conjunto' }}
+        </button>
+        <a routerLink="/datasets" class="btn-secondary">Cancelar</a>
+      </section>
+    </aside>
+  </form>
+</section>

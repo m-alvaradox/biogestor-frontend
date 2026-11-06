@@ -38,3 +38,24 @@ export interface DatasetDetail extends Dataset {
   type_metadata: Record<string, unknown> | null;
   storage: DatasetStorage;
 }
+
+export interface DatasetCreatePayload {
+  name: string;
+  type: DatasetType;
+  status: DatasetStatus;
+  description: string | null;
+  species: string | null;
+  farm: string | null;
+  pool: string | null;
+  capture_date: string | null;
+  license: string | null;
+  owner: number | null;
+  type_metadata: Record<string, unknown> | null;
+  storage: DatasetStorage;
+}
+
+export interface DatasetCreated extends Omit<DatasetCreatePayload, 'status'> {
+  id: number;
+  status: DatasetStatus | null;
+  created_at: string;
+}

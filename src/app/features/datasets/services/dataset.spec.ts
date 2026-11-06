@@ -2,7 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { DatasetDetail, DatasetPage } from '../models/dataset';
+import {
+  DatasetCreatePayload,
+  DatasetCreated,
+  DatasetDetail,
+  DatasetPage,
+} from '../models/dataset';
 import { DatasetService } from './dataset';
 
 describe('DatasetService', () => {
@@ -80,5 +85,38 @@ describe('DatasetService', () => {
     request.flush(detail);
 
     expect(response).toEqual(detail);
+  });
+
+  it('sends a new dataset to the API', () => {
+    const payload: DatasetCreatePayload = {
+      name: 'Lote de audio de tilapia 002',
+      type: 'audio',
+      status: 'active',
+      description: null,
+      species: 'Tilapia',
+      farm: null,
+      pool: null,
+      capture_date: null,
+      license: null,
+      owner: 2,
+      type_metadata: { microphone: 'Hidrófono genérico', sample_rate: 44100 },
+      storage: { s3_uri: null, file_format: null, size_bytes: null, file_count: null },
+    };
+    const created: DatasetCreated = {
+      ...payload,
+      id: 9,
+      created_at: '2026-11-04T10:00:00Z',
+    };
+    let response: DatasetCreated | undefined;
+
+    service.create(payload).subscribe((result) => (response = result));
+
+    const request = http.expectOne('/api/v1/datasets/');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual(payload);
+
+    request.flush(created);
+
+    expect(response).toEqual(created);
   });
 });
