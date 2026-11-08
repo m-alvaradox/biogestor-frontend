@@ -123,7 +123,23 @@ describe('DatasetService', () => {
 
   it('sends the changed fields of a dataset to the API', () => {
     const payload: DatasetUpdatePayload = { name: 'Cantos de tilapia v2', species: null };
-    let response: DatasetDetail | undefined;
+    const updated: DatasetCreated = {
+      id: 5,
+      name: 'Cantos de tilapia v2',
+      type: 'audio',
+      status: 'active',
+      owner: 3,
+      created_at: '2026-10-20T15:30:00Z',
+      description: 'Grabaciones nocturnas',
+      species: null,
+      farm: null,
+      pool: null,
+      capture_date: null,
+      license: null,
+      type_metadata: null,
+      storage: { s3_uri: null, file_format: null, size_bytes: null, file_count: null },
+    };
+    let response: DatasetCreated | undefined;
 
     service.update(5, payload).subscribe((result) => (response = result));
 
@@ -131,9 +147,9 @@ describe('DatasetService', () => {
     expect(request.request.method).toBe('PATCH');
     expect(request.request.body).toEqual(payload);
 
-    request.flush({ id: 5, name: 'Cantos de tilapia v2' });
+    request.flush(updated);
 
-    expect(response?.name).toBe('Cantos de tilapia v2');
+    expect(response).toEqual(updated);
   });
 
   it('deletes a dataset by id', () => {

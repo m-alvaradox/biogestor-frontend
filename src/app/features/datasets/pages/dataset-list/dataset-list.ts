@@ -49,25 +49,22 @@ export class DatasetList implements OnInit {
       return;
     }
 
-    const removeRow = () => {
-      this.deleting.set(false);
-      this.datasets.update((datasets) => datasets.filter((item) => item.id !== dataset.id));
-      this.deletedDataset.set(dataset.name);
-      this.pendingDelete.set(null);
-    };
-
     this.deleting.set(true);
     this.deleteError.set('');
 
     this.datasetService.delete(dataset.id).subscribe({
-      next: removeRow,
+      next: () => {
+        this.deleting.set(false);
+        this.datasets.update((datasets) => datasets.filter((item) => item.id !== dataset.id));
+        this.deletedDataset.set(dataset.name);
+        this.pendingDelete.set(null);
+      },
       error: (response: HttpErrorResponse) => {
-        if (response.status === 404) {
-          removeRow();
-          return;
-        }
         this.deleting.set(false);
         this.deleteError.set(deleteErrorMessage(response));
+        if (response.status === 404) {
+          this.load();
+        }
       },
     });
   }

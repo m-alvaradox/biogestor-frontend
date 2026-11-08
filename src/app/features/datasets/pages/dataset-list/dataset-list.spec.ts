@@ -262,14 +262,21 @@ describe('DatasetList', () => {
       );
     });
 
-    it('should remove the row when the dataset was already deleted', () => {
+    it('should explain a 404 and reload the catalog instead of removing the row', () => {
       dialogButton('Eliminar').click();
       http
         .expectOne('/api/v1/datasets/2/')
         .flush({ detail: 'No encontrado.' }, { status: 404, statusText: 'Not Found' });
       fixture.detectChanges();
 
-      expect(names()).toEqual(['Cantos de aves', 'Mediciones de oxígeno']);
+      expect(dialog()?.textContent).toContain(
+        'El dataset no existe o la eliminación no está disponible.',
+      );
+      expect(fixture.nativeElement.querySelector('.success-message')).toBeNull();
+
+      respond(filledPage);
+
+      expect(names()).toEqual(['Cantos de aves', 'Fotos de estanques', 'Mediciones de oxígeno']);
     });
 
     it('should keep the row and show the error when the deletion fails', () => {

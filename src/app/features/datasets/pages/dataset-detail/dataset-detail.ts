@@ -66,21 +66,15 @@ export class DatasetDetailPage implements OnInit {
       return;
     }
 
-    const leave = () =>
-      void this.router.navigate(['/datasets'], { state: { deletedDataset: dataset.name } });
-
     this.deleting.set(true);
     this.deleteError.set('');
 
     this.datasetService.delete(dataset.id).subscribe({
-      next: leave,
+      next: () =>
+        void this.router.navigate(['/datasets'], { state: { deletedDataset: dataset.name } }),
       error: (response: HttpErrorResponse) => {
         this.deleting.set(false);
-        if (response.status === 404) {
-          leave();
-        } else {
-          this.deleteError.set(deleteErrorMessage(response));
-        }
+        this.deleteError.set(deleteErrorMessage(response));
       },
     });
   }

@@ -373,7 +373,7 @@ describe('DatasetForm in edit mode', () => {
       tags: '["noche","lluvia"]',
     });
 
-    request.flush({ ...detail, name: 'Cantos de tilapia v2' });
+    request.flush({ ...detail, name: 'Cantos de tilapia v2', owner: 3 });
 
     expect(router.navigate).toHaveBeenCalledWith(['/datasets', 5], {
       state: { updatedDataset: 'Cantos de tilapia v2' },

@@ -272,15 +272,17 @@ describe('DatasetDetailPage', () => {
       });
     });
 
-    it('should return to the catalog when the dataset was already deleted', () => {
+    it('should stay on the detail and explain a 404 instead of assuming the deletion', () => {
       dialogButton('Eliminar').click();
       http
         .expectOne('/api/v1/datasets/5/')
         .flush({ detail: 'No encontrado.' }, { status: 404, statusText: 'Not Found' });
+      fixture.detectChanges();
 
-      expect(router.navigate).toHaveBeenCalledWith(['/datasets'], {
-        state: { deletedDataset: 'Cantos de tilapia' },
-      });
+      expect(dialog()?.textContent).toContain(
+        'El dataset no existe o la eliminación no está disponible.',
+      );
+      expect(router.navigate).not.toHaveBeenCalled();
     });
 
     it('should keep the dialog open and show the reason when the API refuses', () => {
