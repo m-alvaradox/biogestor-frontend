@@ -15,6 +15,20 @@
     </p>
   }
 
+  @if (deletedDataset(); as name) {
+    <p class="success-message" role="status">Dataset "{{ name }}" eliminado correctamente.</p>
+  }
+
+  <app-confirm-dialog
+    [open]="pendingDelete() !== null"
+    title="Eliminar dataset"
+    [message]="'¿Eliminar «' + pendingDelete()?.name + '»? Esta acción no se puede deshacer.'"
+    [busy]="deleting()"
+    [error]="deleteError()"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()"
+  />
+
   <!-- Catálogo de datasets -->
   <section class="card catalog-card" aria-label="Catálogo de datasets">
     <!-- Controles de búsqueda y filtrado -->
@@ -79,20 +93,10 @@
                 <td>
                   <div class="row-actions">
                     <a [routerLink]="['/datasets', dataset.id]" class="action action-view">Ver</a>
-                    <button
-                      type="button"
-                      class="action action-edit"
-                      disabled
-                      title="Disponible próximamente"
-                    >
+                    <a [routerLink]="['/datasets', dataset.id, 'edit']" class="action action-edit">
                       Editar
-                    </button>
-                    <button
-                      type="button"
-                      class="action action-delete"
-                      disabled
-                      title="Disponible próximamente"
-                    >
+                    </a>
+                    <button type="button" class="action action-delete" (click)="askDelete(dataset)">
                       Eliminar
                     </button>
                   </div>

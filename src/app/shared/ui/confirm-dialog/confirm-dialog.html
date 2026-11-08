@@ -1,0 +1,32 @@
+@if (open()) {
+  <div class="backdrop"></div>
+  <div
+    class="card dialog"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="confirm-dialog-title"
+    aria-describedby="confirm-dialog-message"
+  >
+    <h2 id="confirm-dialog-title">{{ title() }}</h2>
+    <p id="confirm-dialog-message">{{ message() }}</p>
+
+    @if (error()) {
+      <p class="dialog-error" role="alert">{{ error() }}</p>
+    }
+
+    <div class="dialog-actions">
+      <button
+        #cancelButton
+        type="button"
+        class="btn-secondary"
+        [disabled]="busy()"
+        (click)="cancel()"
+      >
+        Cancelar
+      </button>
+      <button type="button" class="btn-danger btn-confirm" [disabled]="busy()" (click)="confirm()">
+        {{ busy() ? 'Eliminando...' : confirmLabel() }}
+      </button>
+    </div>
+  </div>
+}

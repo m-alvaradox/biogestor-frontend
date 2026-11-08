@@ -7,6 +7,7 @@ import {
   DatasetCreated,
   DatasetDetail,
   DatasetPage,
+  DatasetUpdatePayload,
 } from '../models/dataset';
 import { DatasetService } from './dataset';
 
@@ -118,5 +119,33 @@ describe('DatasetService', () => {
     request.flush(created);
 
     expect(response).toEqual(created);
+  });
+
+  it('sends the changed fields of a dataset to the API', () => {
+    const payload: DatasetUpdatePayload = { name: 'Cantos de tilapia v2', species: null };
+    let response: DatasetDetail | undefined;
+
+    service.update(5, payload).subscribe((result) => (response = result));
+
+    const request = http.expectOne('/api/v1/datasets/5/');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual(payload);
+
+    request.flush({ id: 5, name: 'Cantos de tilapia v2' });
+
+    expect(response?.name).toBe('Cantos de tilapia v2');
+  });
+
+  it('deletes a dataset by id', () => {
+    let completed = false;
+
+    service.delete(5).subscribe({ complete: () => (completed = true) });
+
+    const request = http.expectOne('/api/v1/datasets/5/');
+    expect(request.request.method).toBe('DELETE');
+
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(completed).toBe(true);
   });
 });

@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import {
   AbstractControl,
   FormControl,
@@ -13,9 +13,11 @@ import { Router, RouterLink } from '@angular/router';
 import { DATASET_STATUS_LABELS, DATASET_TYPE_LABELS } from '../../models/dataset-labels';
 import {
   DatasetCreatePayload,
+  DatasetDetail,
   DatasetOwner,
   DatasetStatus,
   DatasetType,
+  DatasetUpdatePayload,
 } from '../../models/dataset';
 import { TYPE_METADATA_FIELDS, TypeMetadataField } from '../../models/dataset-type-metadata';
 import { DatasetService } from '../../services/dataset';
@@ -43,6 +45,8 @@ type CustomFieldGroup = FormGroup<{
   key: FormControl<string>;
   value: FormControl<string>;
 }>;
+
+type LoadState = 'idle' | 'loading' | 'ready' | 'not-found' | 'error';
 
 const STORAGE_FIELDS: FieldName[] = ['s3_uri', 'file_format', 'size_bytes', 'file_count'];
 
@@ -92,17 +96,36 @@ function typeFieldValue(field: TypeMetadataField, raw: TypeFieldValue): unknown 
   return textOrNull(`${raw}`);
 }
 
+function typeFieldInput(field: TypeMetadataField, value: unknown): TypeFieldValue {
+  if (value === null || value === undefined) {
+    return field.kind === 'number' ? null : '';
+  }
+  if (field.kind === 'number') {
+    return typeof value === 'number' ? value : Number(value);
+  }
+  if (field.kind === 'list' && Array.isArray(value)) {
+    return value.join(', ');
+  }
+  return metadataText(value);
+}
+
+function metadataText(value: unknown): string {
+  return typeof value === 'string' ? value : JSON.stringify(value);
+}
+
 @Component({
   imports: [ReactiveFormsModule, RouterLink],
   selector: 'app-dataset-form',
   styleUrl: './dataset-form.scss',
   templateUrl: './dataset-form.html',
 })
-export class DatasetForm {
+export class DatasetForm implements OnInit {
   private readonly datasetService = inject(DatasetService);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
   private readonly fb = inject(NonNullableFormBuilder);
+
+  readonly id = input<string>();
 
   readonly typeOptions = Object.entries(DATASET_TYPE_LABELS) as [DatasetType, string][];
   readonly statusOptions = Object.entries(DATASET_STATUS_LABELS) as [DatasetStatus, string][];
@@ -114,13 +137,22 @@ export class DatasetForm {
   readonly typeFields = signal<TypeMetadataField[]>([]);
   readonly owners = signal<DatasetOwner[]>([]);
   readonly ownersState = signal<'loading' | 'ready' | 'error'>('loading');
+  readonly loadState = signal<LoadState>('idle');
+  readonly datasetId = signal<number | null>(null);
+  readonly datasetName = signal('');
+  readonly isEdit = computed(() => this.id() !== undefined);
+  readonly cancelLink = computed(() =>
+    this.datasetId() === null ? ['/datasets'] : ['/datasets', this.datasetId()],
+  );
+
+  private readonly omitWhenPristine = new Set<FieldName>();
 
   private readonly typeFieldControls = this.fb.record<FormControl<TypeFieldValue>>({});
 
   readonly form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(150)]],
     type: ['' as DatasetType | '', Validators.required],
-    status: ['active' as DatasetStatus],
+    status: ['active' as DatasetStatus | ''],
     description: [''],
     species: ['', Validators.maxLength(100)],
     farm: ['', Validators.maxLength(100)],
@@ -151,6 +183,35 @@ export class DatasetForm {
       if (Object.keys(this.serverErrors()).length > 0) {
         this.serverErrors.set({});
       }
+    });
+  }
+
+  ngOnInit(): void {
+    if (this.isEdit()) {
+      this.loadDataset();
+    }
+  }
+
+  loadDataset(): void {
+    const id = Number(this.id());
+
+    if (!Number.isInteger(id) || id <= 0) {
+      this.loadState.set('not-found');
+      return;
+    }
+
+    this.loadState.set('loading');
+
+    this.datasetService.get(id).subscribe({
+      next: (dataset) => {
+        this.fillForm(dataset);
+        this.datasetId.set(id);
+        this.datasetName.set(dataset.name);
+        this.loadState.set('ready');
+      },
+      error: (response: HttpErrorResponse) => {
+        this.loadState.set(response.status === 404 ? 'not-found' : 'error');
+      },
     });
   }
 
@@ -217,16 +278,95 @@ export class DatasetForm {
 
     this.saving.set(true);
 
-    this.datasetService.create(this.buildPayload()).subscribe({
+    const id = this.datasetId();
+    const onError = (error: HttpErrorResponse) => {
+      this.saving.set(false);
+      this.handleError(error);
+    };
+
+    if (id === null) {
+      this.datasetService.create(this.buildPayload()).subscribe({
+        next: (dataset) => {
+          this.saving.set(false);
+          void this.router.navigate(['/datasets'], { state: { createdDataset: dataset.name } });
+        },
+        error: onError,
+      });
+      return;
+    }
+
+    this.datasetService.update(id, this.buildUpdatePayload()).subscribe({
       next: (dataset) => {
         this.saving.set(false);
-        void this.router.navigate(['/datasets'], { state: { createdDataset: dataset.name } });
+        void this.router.navigate(['/datasets', id], {
+          state: { updatedDataset: dataset.name },
+        });
       },
-      error: (error: HttpErrorResponse) => {
-        this.saving.set(false);
-        this.handleError(error);
-      },
+      error: onError,
     });
+  }
+
+  private buildUpdatePayload(): DatasetUpdatePayload {
+    const payload: DatasetUpdatePayload = this.buildPayload();
+
+    for (const field of this.omitWhenPristine) {
+      if (this.form.controls[field].pristine) {
+        delete payload[field as keyof DatasetUpdatePayload];
+      }
+    }
+
+    return payload;
+  }
+
+  private fillForm(dataset: DatasetDetail): void {
+    const controls = this.form.controls;
+    const metadata = dataset.type_metadata ?? {};
+    const typeKeys = new Set(TYPE_METADATA_FIELDS[dataset.type].map((field) => field.key));
+
+    controls.type.setValue(dataset.type);
+
+    for (const field of this.typeFields()) {
+      this.typeFieldControls.controls[field.key]?.setValue(
+        typeFieldInput(field, metadata[field.key]),
+      );
+    }
+
+    controls.custom_fields.clear();
+    for (const [key, value] of Object.entries(metadata)) {
+      if (!typeKeys.has(key)) {
+        controls.custom_fields.push(this.fb.group({ key: [key], value: [metadataText(value)] }));
+      }
+    }
+
+    this.form.patchValue({
+      name: dataset.name,
+      status: dataset.status || '',
+      description: dataset.description ?? '',
+      species: dataset.species ?? '',
+      farm: dataset.farm ?? '',
+      pool: dataset.pool ?? '',
+      capture_date: dataset.capture_date ?? '',
+      license: dataset.license ?? '',
+      s3_uri: dataset.storage.s3_uri ?? '',
+      file_format: dataset.storage.file_format ?? '',
+      size_bytes: dataset.storage.size_bytes,
+      file_count: dataset.storage.file_count,
+    });
+    controls.owner.setValue(dataset.owner?.id ?? null);
+
+    this.omitWhenPristine.clear();
+    if (!('description' in dataset)) {
+      this.omitWhenPristine.add('description');
+    }
+    if (!('license' in dataset)) {
+      this.omitWhenPristine.add('license');
+    }
+    if (!dataset.status) {
+      this.omitWhenPristine.add('status');
+    }
+
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   private buildPayload(): DatasetCreatePayload {
@@ -235,7 +375,7 @@ export class DatasetForm {
     return {
       name: value.name.trim(),
       type: value.type as DatasetType,
-      status: value.status,
+      status: value.status as DatasetStatus,
       description: textOrNull(value.description),
       species: textOrNull(value.species),
       farm: textOrNull(value.farm),
@@ -324,8 +464,16 @@ export class DatasetForm {
   }
 
   private handleError(error: HttpErrorResponse): void {
+    if (error.status === 404 && this.isEdit()) {
+      this.submitError.set('El dataset ya no existe. Pudo haber sido eliminado.');
+      return;
+    }
     if (error.status !== 400 || typeof error.error !== 'object' || error.error === null) {
-      this.submitError.set('No se pudo registrar el dataset. Inténtalo de nuevo más tarde.');
+      this.submitError.set(
+        this.isEdit()
+          ? 'No se pudieron guardar los cambios. Inténtalo de nuevo más tarde.'
+          : 'No se pudo registrar el dataset. Inténtalo de nuevo más tarde.',
+      );
       return;
     }
 

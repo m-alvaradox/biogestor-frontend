@@ -25,6 +25,11 @@ export const routes: Routes = [
           import('./features/datasets/pages/dataset-form/dataset-form').then((m) => m.DatasetForm),
       },
       {
+        path: 'datasets/:id/edit',
+        loadComponent: () =>
+          import('./features/datasets/pages/dataset-form/dataset-form').then((m) => m.DatasetForm),
+      },
+      {
         path: 'datasets/:id',
         loadComponent: () =>
           import('./features/datasets/pages/dataset-detail/dataset-detail').then(

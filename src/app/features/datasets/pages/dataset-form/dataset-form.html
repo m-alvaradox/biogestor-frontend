@@ -2,15 +2,52 @@
   <nav class="breadcrumb" aria-label="Ruta de navegación">
     <a routerLink="/datasets">Conjuntos de datos</a>
     <span aria-hidden="true">›</span>
-    <span aria-current="page">Registrar nuevo conjunto</span>
+    @if (isEdit()) {
+      @if (datasetId() !== null) {
+        <a [routerLink]="cancelLink()">{{ datasetName() }}</a>
+        <span aria-hidden="true">›</span>
+      }
+      <span aria-current="page">Editar conjunto</span>
+    } @else {
+      <span aria-current="page">Registrar nuevo conjunto</span>
+    }
   </nav>
 
   <header class="page-header">
-    <h1>Registrar nuevo conjunto</h1>
-    <p>Completa los metadatos para registrar un nuevo conjunto en BioGestor.</p>
+    @if (isEdit()) {
+      <h1>Editar conjunto</h1>
+      <p>Modifica los metadatos del conjunto y guarda los cambios.</p>
+    } @else {
+      <h1>Registrar nuevo conjunto</h1>
+      <p>Completa los metadatos para registrar un nuevo conjunto en BioGestor.</p>
+    }
   </header>
 
-  <form class="form-layout" [formGroup]="form" (ngSubmit)="save()" novalidate>
+  @switch (loadState()) {
+    @case ('loading') {
+      <div class="card state-card"><p>Cargando dataset...</p></div>
+    }
+    @case ('not-found') {
+      <div class="card state-card">
+        <p>No se encontró el dataset solicitado.</p>
+        <a routerLink="/datasets" class="btn-secondary">Volver al catálogo</a>
+      </div>
+    }
+    @case ('error') {
+      <div class="card state-card" role="alert">
+        <p>No se pudo cargar el dataset.</p>
+        <button type="button" class="btn-secondary" (click)="loadDataset()">Reintentar</button>
+      </div>
+    }
+  }
+
+  <form
+    class="form-layout"
+    [formGroup]="form"
+    (ngSubmit)="save()"
+    novalidate
+    [hidden]="isEdit() && loadState() !== 'ready'"
+  >
     <div class="form-main">
       <section class="card form-card" aria-labelledby="basic-title">
         <h2 id="basic-title">Información básica</h2>
@@ -314,8 +351,11 @@
         <h2 id="status-title">Estado</h2>
 
         <div class="field">
-          <label for="status">Estado inicial</label>
+          <label for="status">{{ isEdit() ? 'Estado' : 'Estado inicial' }}</label>
           <select id="status" formControlName="status" [class.invalid]="errorFor('status')">
+            @if (form.controls.status.value === '') {
+              <option value="" disabled>Sin estado</option>
+            }
             @for (option of statusOptions; track option[0]) {
               <option [value]="option[0]">{{ option[1] }}</option>
             }
@@ -334,9 +374,9 @@
         }
 
         <button type="submit" class="btn-primary" [disabled]="saving()">
-          {{ saving() ? 'Guardando...' : 'Guardar conjunto' }}
+          {{ saving() ? 'Guardando...' : isEdit() ? 'Guardar cambios' : 'Guardar conjunto' }}
         </button>
-        <a routerLink="/datasets" class="btn-secondary">Cancelar</a>
+        <a [routerLink]="cancelLink()" class="btn-secondary">Cancelar</a>
       </section>
     </aside>
   </form>

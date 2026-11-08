@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { Navigation, Router, provideRouter } from '@angular/router';
 
 import { DatasetDetail } from '../../models/dataset';
 import { DatasetDetailPage } from './dataset-detail';
@@ -148,19 +148,31 @@ describe('DatasetDetailPage', () => {
     expect(text()).toContain('Sin estado');
   });
 
-  it('should keep edit and delete disabled', () => {
+  it('should link the edit button to the edit form', () => {
     open('5');
     http.expectOne('/api/v1/datasets/5/').flush(audioDataset);
     fixture.detectChanges();
 
-    const buttons = Array.from(
-      fixture.nativeElement.querySelectorAll('.header-actions button'),
-    ) as HTMLButtonElement[];
+    const link: HTMLAnchorElement = fixture.nativeElement.querySelector('.header-actions a');
 
-    expect(buttons.map((button) => [button.textContent?.trim(), button.disabled])).toEqual([
-      ['Editar', true],
-      ['Eliminar', true],
-    ]);
+    expect(link.textContent?.trim()).toBe('Editar');
+    expect(link.getAttribute('href')).toBe('/datasets/5/edit');
+    expect(fixture.nativeElement.querySelector('.success-message')).toBeNull();
+  });
+
+  it('should confirm the update when coming back from the edit form', () => {
+    vi.spyOn(TestBed.inject(Router), 'currentNavigation').mockReturnValue({
+      extras: { state: { updatedDataset: 'Cantos de tilapia v2' } },
+    } as unknown as Navigation);
+    fixture.destroy();
+    fixture = TestBed.createComponent(DatasetDetailPage);
+    open('5');
+    http.expectOne('/api/v1/datasets/5/').flush(audioDataset);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.success-message').textContent).toContain(
+      'Dataset "Cantos de tilapia v2" actualizado correctamente.',
+    );
   });
 
   it('should show "No encontrado" when the API returns 404', () => {
@@ -204,5 +216,96 @@ describe('DatasetDetailPage', () => {
     const link: HTMLAnchorElement = fixture.nativeElement.querySelector('.back-link');
 
     expect(link.getAttribute('href')).toBe('/datasets');
+  });
+
+  describe('delete', () => {
+    let router: Router;
+
+    beforeEach(() => {
+      router = TestBed.inject(Router);
+      vi.spyOn(router, 'navigate').mockResolvedValue(true);
+      open('5');
+      http.expectOne('/api/v1/datasets/5/').flush(audioDataset);
+      fixture.detectChanges();
+      fixture.nativeElement.querySelector('.header-actions .btn-danger').click();
+      fixture.detectChanges();
+    });
+
+    function dialog(): HTMLElement | null {
+      return fixture.nativeElement.querySelector('[role="alertdialog"]');
+    }
+
+    function dialogButton(label: string): HTMLButtonElement {
+      const buttons = Array.from(
+        fixture.nativeElement.querySelectorAll('.dialog-actions button'),
+      ) as HTMLButtonElement[];
+      return buttons.find((button) => button.textContent?.trim() === label)!;
+    }
+
+    it('should ask for confirmation before deleting', () => {
+      expect(dialog()?.textContent).toContain(
+        '¿Eliminar «Cantos de tilapia»? Esta acción no se puede deshacer.',
+      );
+      http.expectNone('/api/v1/datasets/5/');
+    });
+
+    it('should close the dialog without deleting when cancelled', () => {
+      dialogButton('Cancelar').click();
+      fixture.detectChanges();
+
+      expect(dialog()).toBeNull();
+      http.expectNone('/api/v1/datasets/5/');
+    });
+
+    it('should delete the dataset and return to the catalog', () => {
+      dialogButton('Eliminar').click();
+      fixture.detectChanges();
+
+      const request = http.expectOne('/api/v1/datasets/5/');
+      expect(request.request.method).toBe('DELETE');
+      expect(dialogButton('Eliminando...').disabled).toBe(true);
+
+      request.flush(null, { status: 204, statusText: 'No Content' });
+
+      expect(router.navigate).toHaveBeenCalledWith(['/datasets'], {
+        state: { deletedDataset: 'Cantos de tilapia' },
+      });
+    });
+
+    it('should return to the catalog when the dataset was already deleted', () => {
+      dialogButton('Eliminar').click();
+      http
+        .expectOne('/api/v1/datasets/5/')
+        .flush({ detail: 'No encontrado.' }, { status: 404, statusText: 'Not Found' });
+
+      expect(router.navigate).toHaveBeenCalledWith(['/datasets'], {
+        state: { deletedDataset: 'Cantos de tilapia' },
+      });
+    });
+
+    it('should keep the dialog open and show the reason when the API refuses', () => {
+      dialogButton('Eliminar').click();
+      http
+        .expectOne('/api/v1/datasets/5/')
+        .flush(
+          { detail: 'El dataset tiene experimentos asociados.' },
+          { status: 409, statusText: 'Conflict' },
+        );
+      fixture.detectChanges();
+
+      expect(dialog()?.textContent).toContain('El dataset tiene experimentos asociados.');
+      expect(dialogButton('Eliminar').disabled).toBe(false);
+      expect(router.navigate).not.toHaveBeenCalled();
+    });
+
+    it('should show a generic message when the server fails', () => {
+      dialogButton('Eliminar').click();
+      http
+        .expectOne('/api/v1/datasets/5/')
+        .flush(null, { status: 500, statusText: 'Internal Server Error' });
+      fixture.detectChanges();
+
+      expect(dialog()?.textContent).toContain('No se pudo eliminar el dataset.');
+    });
   });
 });

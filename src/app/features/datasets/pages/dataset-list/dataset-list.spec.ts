@@ -161,15 +161,12 @@ describe('DatasetList', () => {
     expect(links).toEqual(['/datasets/1', '/datasets/2', '/datasets/3']);
   });
 
-  it('should keep edit and delete actions disabled', () => {
+  it('should link each dataset to its edit form', () => {
     respond(filledPage);
 
-    const buttons = Array.from(
-      fixture.nativeElement.querySelectorAll('.action-edit, .action-delete'),
-    ) as HTMLButtonElement[];
+    const links = rows().map((row) => row.querySelector('.action-edit')?.getAttribute('href'));
 
-    expect(buttons.length).toBe(6);
-    expect(buttons.every((button) => button.disabled)).toBe(true);
+    expect(links).toEqual(['/datasets/1/edit', '/datasets/2/edit', '/datasets/3/edit']);
   });
 
   it('should show an error and retry the request', () => {
@@ -209,5 +206,81 @@ describe('DatasetList', () => {
 
     expect(searchInput.disabled).toBe(true);
     expect(typeFilter.disabled).toBe(true);
+  });
+
+  describe('delete', () => {
+    beforeEach(() => {
+      respond(filledPage);
+      rows()[1].querySelector<HTMLButtonElement>('.action-delete')!.click();
+      fixture.detectChanges();
+    });
+
+    function dialog(): HTMLElement | null {
+      return fixture.nativeElement.querySelector('[role="alertdialog"]');
+    }
+
+    function dialogButton(label: string): HTMLButtonElement {
+      const buttons = Array.from(
+        fixture.nativeElement.querySelectorAll('.dialog-actions button'),
+      ) as HTMLButtonElement[];
+      return buttons.find((button) => button.textContent?.trim() === label)!;
+    }
+
+    function names(): string[] {
+      return rows().map((row) => row.querySelector('td')?.textContent?.trim() ?? '');
+    }
+
+    it('should ask for confirmation with the name of the dataset', () => {
+      expect(dialog()?.textContent).toContain(
+        '¿Eliminar «Fotos de estanques»? Esta acción no se puede deshacer.',
+      );
+      http.expectNone('/api/v1/datasets/2/');
+    });
+
+    it('should keep the row when the user cancels', () => {
+      dialogButton('Cancelar').click();
+      fixture.detectChanges();
+
+      expect(dialog()).toBeNull();
+      expect(rows().length).toBe(3);
+      http.expectNone('/api/v1/datasets/2/');
+    });
+
+    it('should remove the row and confirm the deletion', () => {
+      dialogButton('Eliminar').click();
+
+      const request = http.expectOne('/api/v1/datasets/2/');
+      expect(request.request.method).toBe('DELETE');
+
+      request.flush(null, { status: 204, statusText: 'No Content' });
+      fixture.detectChanges();
+
+      expect(dialog()).toBeNull();
+      expect(names()).toEqual(['Cantos de aves', 'Mediciones de oxígeno']);
+      expect(fixture.nativeElement.querySelector('.success-message').textContent).toContain(
+        'Dataset "Fotos de estanques" eliminado correctamente.',
+      );
+    });
+
+    it('should remove the row when the dataset was already deleted', () => {
+      dialogButton('Eliminar').click();
+      http
+        .expectOne('/api/v1/datasets/2/')
+        .flush({ detail: 'No encontrado.' }, { status: 404, statusText: 'Not Found' });
+      fixture.detectChanges();
+
+      expect(names()).toEqual(['Cantos de aves', 'Mediciones de oxígeno']);
+    });
+
+    it('should keep the row and show the error when the deletion fails', () => {
+      dialogButton('Eliminar').click();
+      http
+        .expectOne('/api/v1/datasets/2/')
+        .flush(null, { status: 500, statusText: 'Internal Server Error' });
+      fixture.detectChanges();
+
+      expect(rows().length).toBe(3);
+      expect(dialog()?.textContent).toContain('No se pudo eliminar el dataset.');
+    });
   });
 });

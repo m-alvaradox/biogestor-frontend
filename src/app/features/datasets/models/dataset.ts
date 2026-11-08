@@ -37,6 +37,8 @@ export interface DatasetDetail extends Dataset {
   capture_date: string | null;
   type_metadata: Record<string, unknown> | null;
   storage: DatasetStorage;
+  description?: string | null;
+  license?: string | null;
 }
 
 export interface DatasetCreatePayload {
@@ -59,3 +61,5 @@ export interface DatasetCreated extends Omit<DatasetCreatePayload, 'status'> {
   status: DatasetStatus | null;
   created_at: string;
 }
+
+export type DatasetUpdatePayload = Partial<DatasetCreatePayload>;
