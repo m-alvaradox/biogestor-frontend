@@ -175,6 +175,21 @@ describe('DatasetDetailPage', () => {
     );
   });
 
+  it('should confirm the registration when coming from the create form', () => {
+    vi.spyOn(TestBed.inject(Router), 'currentNavigation').mockReturnValue({
+      extras: { state: { createdDataset: 'Cantos de tilapia' } },
+    } as unknown as Navigation);
+    fixture.destroy();
+    fixture = TestBed.createComponent(DatasetDetailPage);
+    open('5');
+    http.expectOne('/api/v1/datasets/5/').flush(audioDataset);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.success-message').textContent).toContain(
+      'Dataset "Cantos de tilapia" registrado correctamente.',
+    );
+  });
+
   it('should show "No encontrado" when the API returns 404', () => {
     open('999999');
     http

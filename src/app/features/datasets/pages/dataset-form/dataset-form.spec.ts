@@ -189,7 +189,7 @@ describe('DatasetForm', () => {
 
     request.flush({ id: 9, name: 'Lote de audio de tilapia 002' });
 
-    expect(router.navigate).toHaveBeenCalledWith(['/datasets'], {
+    expect(router.navigate).toHaveBeenCalledWith(['/datasets', 9], {
       state: { createdDataset: 'Lote de audio de tilapia 002' },
     });
   });

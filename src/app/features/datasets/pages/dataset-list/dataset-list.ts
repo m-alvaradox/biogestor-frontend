@@ -19,7 +19,6 @@ export class DatasetList implements OnInit {
 
   private readonly navigationState = inject(Router).currentNavigation()?.extras.state;
 
-  readonly createdDataset: string | undefined = this.navigationState?.['createdDataset'];
   readonly deletedDataset = signal<string | undefined>(this.navigationState?.['deletedDataset']);
 
   readonly datasets = signal<Dataset[]>([]);
