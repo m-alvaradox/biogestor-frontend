@@ -7,6 +7,7 @@ import {
   DatasetCreated,
   DatasetDetail,
   DatasetPage,
+  DatasetUpdatePayload,
 } from '../models/dataset';
 import { DatasetService } from './dataset';
 
@@ -118,5 +119,49 @@ describe('DatasetService', () => {
     request.flush(created);
 
     expect(response).toEqual(created);
+  });
+
+  it('sends the changed fields of a dataset to the API', () => {
+    const payload: DatasetUpdatePayload = { name: 'Cantos de tilapia v2', species: null };
+    const updated: DatasetCreated = {
+      id: 5,
+      name: 'Cantos de tilapia v2',
+      type: 'audio',
+      status: 'active',
+      owner: 3,
+      created_at: '2026-10-20T15:30:00Z',
+      description: 'Grabaciones nocturnas',
+      species: null,
+      farm: null,
+      pool: null,
+      capture_date: null,
+      license: null,
+      type_metadata: null,
+      storage: { s3_uri: null, file_format: null, size_bytes: null, file_count: null },
+    };
+    let response: DatasetCreated | undefined;
+
+    service.update(5, payload).subscribe((result) => (response = result));
+
+    const request = http.expectOne('/api/v1/datasets/5/');
+    expect(request.request.method).toBe('PATCH');
+    expect(request.request.body).toEqual(payload);
+
+    request.flush(updated);
+
+    expect(response).toEqual(updated);
+  });
+
+  it('deletes a dataset by id', () => {
+    let completed = false;
+
+    service.delete(5).subscribe({ complete: () => (completed = true) });
+
+    const request = http.expectOne('/api/v1/datasets/5/');
+    expect(request.request.method).toBe('DELETE');
+
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(completed).toBe(true);
   });
 });

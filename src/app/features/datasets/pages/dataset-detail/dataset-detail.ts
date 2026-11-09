@@ -1,28 +1,43 @@
 import { DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FileSizePipe } from '../../../../shared/pipes/file-size/file-size';
+import { ConfirmDialog } from '../../../../shared/ui/confirm-dialog/confirm-dialog';
 import { DatasetStatusBadge } from '../../components/dataset-status-badge/dataset-status-badge';
 import { DatasetTypeBadge } from '../../components/dataset-type-badge/dataset-type-badge';
 import { DatasetDetail } from '../../models/dataset';
-import { DatasetService } from '../../services/dataset';
+import { DatasetService, deleteErrorMessage } from '../../services/dataset';
 
 @Component({
-  imports: [DatePipe, RouterLink, FileSizePipe, DatasetStatusBadge, DatasetTypeBadge],
+  imports: [
+    DatePipe,
+    RouterLink,
+    FileSizePipe,
+    ConfirmDialog,
+    DatasetStatusBadge,
+    DatasetTypeBadge,
+  ],
   selector: 'app-dataset-detail',
   styleUrl: './dataset-detail.scss',
   templateUrl: './dataset-detail.html',
 })
 export class DatasetDetailPage implements OnInit {
   private readonly datasetService = inject(DatasetService);
+  private readonly router = inject(Router);
 
   readonly id = input.required<string>();
+
+  readonly updatedDataset: string | undefined =
+    this.router.currentNavigation()?.extras.state?.['updatedDataset'];
 
   readonly dataset = signal<DatasetDetail | null>(null);
   readonly loading = signal(false);
   readonly notFound = signal(false);
   readonly error = signal('');
+  readonly confirmingDelete = signal(false);
+  readonly deleting = signal(false);
+  readonly deleteError = signal('');
 
   readonly typeMetadata = computed(() =>
     Object.entries(this.dataset()?.type_metadata ?? {}).map(([key, value]) => ({
@@ -33,6 +48,35 @@ export class DatasetDetailPage implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  askDelete(): void {
+    this.deleteError.set('');
+    this.confirmingDelete.set(true);
+  }
+
+  cancelDelete(): void {
+    this.confirmingDelete.set(false);
+  }
+
+  confirmDelete(): void {
+    const dataset = this.dataset();
+
+    if (!dataset) {
+      return;
+    }
+
+    this.deleting.set(true);
+    this.deleteError.set('');
+
+    this.datasetService.delete(dataset.id).subscribe({
+      next: () =>
+        void this.router.navigate(['/datasets'], { state: { deletedDataset: dataset.name } }),
+      error: (response: HttpErrorResponse) => {
+        this.deleting.set(false);
+        this.deleteError.set(deleteErrorMessage(response));
+      },
+    });
   }
 
   load(): void {

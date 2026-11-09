@@ -30,14 +30,26 @@
       </div>
 
       <div class="header-actions">
-        <button type="button" class="btn-secondary" disabled title="Disponible próximamente">
-          Editar
-        </button>
-        <button type="button" class="btn-danger" disabled title="Disponible próximamente">
-          Eliminar
-        </button>
+        <a [routerLink]="['/datasets', dataset.id, 'edit']" class="btn-secondary">Editar</a>
+        <button type="button" class="btn-danger" (click)="askDelete()">Eliminar</button>
       </div>
     </header>
+
+    @if (updatedDataset) {
+      <p class="success-message" role="status">
+        Dataset "{{ updatedDataset }}" actualizado correctamente.
+      </p>
+    }
+
+    <app-confirm-dialog
+      [open]="confirmingDelete()"
+      title="Eliminar dataset"
+      [message]="'¿Eliminar «' + dataset.name + '»? Esta acción no se puede deshacer.'"
+      [busy]="deleting()"
+      [error]="deleteError()"
+      (confirmed)="confirmDelete()"
+      (cancelled)="cancelDelete()"
+    />
 
     <div class="detail-grid">
       <section class="card detail-card" aria-labelledby="metadata-title">

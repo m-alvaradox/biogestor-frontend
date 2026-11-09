@@ -234,6 +234,29 @@
   font-size: 13px;
 }
 
+.state-card {
+  padding: 24px;
+  text-align: center;
+
+  p {
+    margin: 0 0 16px;
+    color: var(--color-text-muted);
+    font-size: 14px;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.form-layout[hidden] {
+  display: none;
+}
+
 .actions-card {
   display: flex;
   flex-direction: column;
