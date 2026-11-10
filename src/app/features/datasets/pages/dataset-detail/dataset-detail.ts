@@ -9,6 +9,18 @@ import { DatasetTypeBadge } from '../../components/dataset-type-badge/dataset-ty
 import { DatasetDetail } from '../../models/dataset';
 import { DatasetService, deleteErrorMessage } from '../../services/dataset';
 
+function successMessageFrom(state: Record<string, unknown> | undefined): string {
+  const created = state?.['createdDataset'];
+  if (typeof created === 'string') {
+    return `Dataset "${created}" registrado correctamente.`;
+  }
+  const updated = state?.['updatedDataset'];
+  if (typeof updated === 'string') {
+    return `Dataset "${updated}" actualizado correctamente.`;
+  }
+  return '';
+}
+
 @Component({
   imports: [
     DatePipe,
@@ -28,8 +40,9 @@ export class DatasetDetailPage implements OnInit {
 
   readonly id = input.required<string>();
 
-  readonly updatedDataset: string | undefined =
-    this.router.currentNavigation()?.extras.state?.['updatedDataset'];
+  private readonly navigationState = this.router.currentNavigation()?.extras.state;
+
+  readonly successMessage = successMessageFrom(this.navigationState);
 
   readonly dataset = signal<DatasetDetail | null>(null);
   readonly loading = signal(false);

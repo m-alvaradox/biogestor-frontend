@@ -288,7 +288,9 @@ export class DatasetForm implements OnInit {
       this.datasetService.create(this.buildPayload()).subscribe({
         next: (dataset) => {
           this.saving.set(false);
-          void this.router.navigate(['/datasets'], { state: { createdDataset: dataset.name } });
+          void this.router.navigate(['/datasets', dataset.id], {
+            state: { createdDataset: dataset.name },
+          });
         },
         error: onError,
       });

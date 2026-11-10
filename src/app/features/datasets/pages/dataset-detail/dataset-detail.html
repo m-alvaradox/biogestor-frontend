@@ -35,10 +35,8 @@
       </div>
     </header>
 
-    @if (updatedDataset) {
-      <p class="success-message" role="status">
-        Dataset "{{ updatedDataset }}" actualizado correctamente.
-      </p>
+    @if (successMessage) {
+      <p class="success-message" role="status">{{ successMessage }}</p>
     }
 
     <app-confirm-dialog

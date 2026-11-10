@@ -9,12 +9,6 @@
     <a routerLink="/datasets/new" class="btn-primary new-dataset">+ Nuevo conjunto</a>
   </header>
 
-  @if (createdDataset) {
-    <p class="success-message" role="status">
-      Dataset "{{ createdDataset }}" registrado correctamente.
-    </p>
-  }
-
   @if (deletedDataset(); as name) {
     <p class="success-message" role="status">Dataset "{{ name }}" eliminado correctamente.</p>
   }
