@@ -1,8 +1,7 @@
-
-name: "Feature / User Story"
-description: "Registrar una historia de usuario de BioGestor"
-title: "[Feature] "
-labels: ["enhancement"]
+name: 'Feature / User Story'
+description: 'Registrar una historia de usuario de BioGestor'
+title: '[Feature] '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:
@@ -15,8 +14,8 @@ body:
   - type: textarea
     id: story
     attributes:
-      label: "Historia de usuario"
-      description: "Usa el formato Como / Quiero / Para."
+      label: 'Historia de usuario'
+      description: 'Usa el formato Como / Quiero / Para.'
       placeholder: |
         Como [rol],
         quiero [funcionalidad],
@@ -27,8 +26,8 @@ body:
   - type: textarea
     id: acceptance
     attributes:
-      label: "Criterios de aceptación"
-      description: "Utiliza Dado / Cuando / Entonces."
+      label: 'Criterios de aceptación'
+      description: 'Utiliza Dado / Cuando / Entonces.'
       placeholder: |
         Escenario 1:
         Dado que...
@@ -40,7 +39,7 @@ body:
   - type: dropdown
     id: area
     attributes:
-      label: "Área responsable"
+      label: 'Área responsable'
       options:
         - Frontend
         - Backend
@@ -53,32 +52,32 @@ body:
   - type: textarea
     id: scope
     attributes:
-      label: "Alcance y entregables"
-      description: "Explica qué debe implementarse."
+      label: 'Alcance y entregables'
+      description: 'Explica qué debe implementarse.'
     validations:
       required: true
 
   - type: input
     id: estimation
     attributes:
-      label: "Estimación"
-      placeholder: "Ejemplo: 5 puntos de historia"
+      label: 'Estimación'
+      placeholder: 'Ejemplo: 5 puntos de historia'
     validations:
       required: true
 
   - type: textarea
     id: dependencies
     attributes:
-      label: "Dependencias"
-      placeholder: "Issues relacionados o ninguna."
+      label: 'Dependencias'
+      placeholder: 'Issues relacionados o ninguna.'
     validations:
       required: true
 
   - type: textarea
     id: references
     attributes:
-      label: "Referencias"
-      description: "Mockups, rutas Angular, endpoints o entidades."
+      label: 'Referencias'
+      description: 'Mockups, rutas Angular, endpoints o entidades.'
       placeholder: |
         Prototipo:
         Ruta Angular:
@@ -88,8 +87,8 @@ body:
   - type: textarea
     id: metrics
     attributes:
-      label: "Métricas y permisos aplicables"
-      description: "Cuando aplique, especifica métricas de ML y roles autorizados."
+      label: 'Métricas y permisos aplicables'
+      description: 'Cuando aplique, especifica métricas de ML y roles autorizados.'
       placeholder: |
         Categoría y subcategoría:
         Métricas validadas:
@@ -99,26 +98,26 @@ body:
   - type: input
     id: owner
     attributes:
-      label: "Responsable"
-      placeholder: "Usuario(s) de GitHub"
+      label: 'Responsable'
+      placeholder: 'Usuario(s) de GitHub'
     validations:
       required: true
 
   - type: input
     id: sprint
     attributes:
-      label: "Sprint"
-      placeholder: "Ejemplo: Sprint 1"
+      label: 'Sprint'
+      placeholder: 'Ejemplo: Sprint 1'
 
   - type: checkboxes
     id: ready
     attributes:
-      label: "Definition of Ready"
-      description: "Marcar antes de incorporar al sprint."
+      label: 'Definition of Ready'
+      description: 'Marcar antes de incorporar al sprint.'
       options:
-        - label: "El objetivo y los criterios son claros."
-        - label: "La estimación fue acordada por el equipo."
-        - label: "El trabajo cabe dentro del sprint."
-        - label: "Las dependencias están identificadas."
-        - label: "Se incluyeron las referencias necesarias."
-        - label: "El Product Owner aprobó el ítem."
+        - label: 'El objetivo y los criterios son claros.'
+        - label: 'La estimación fue acordada por el equipo.'
+        - label: 'El trabajo cabe dentro del sprint.'
+        - label: 'Las dependencias están identificadas.'
+        - label: 'Se incluyeron las referencias necesarias.'
+        - label: 'El Product Owner aprobó el ítem.'

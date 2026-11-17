@@ -1,8 +1,7 @@
-
-name: "🐛 Bug Report"
-description: "Reportar un error en BioGestor"
-title: "[Bug] "
-labels: ["bug"]
+name: '🐛 Bug Report'
+description: 'Reportar un error en BioGestor'
+title: '[Bug] '
+labels: ['bug']
 body:
   - type: markdown
     attributes:
@@ -14,7 +13,7 @@ body:
   - type: dropdown
     id: area
     attributes:
-      label: "Área afectada"
+      label: 'Área afectada'
       options:
         - Frontend
         - Backend
@@ -28,17 +27,17 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: "Descripción del problema"
-      description: "Explica qué está fallando."
-      placeholder: "Al intentar registrar un dataset..."
+      label: 'Descripción del problema'
+      description: 'Explica qué está fallando.'
+      placeholder: 'Al intentar registrar un dataset...'
     validations:
       required: true
 
   - type: textarea
     id: environment
     attributes:
-      label: "Entorno"
-      description: "Indica entorno, navegador, rama y commit."
+      label: 'Entorno'
+      description: 'Indica entorno, navegador, rama y commit.'
       placeholder: |
         Entorno: local / dev / producción
         Navegador:
@@ -50,7 +49,7 @@ body:
   - type: textarea
     id: steps
     attributes:
-      label: "Pasos para reproducir"
+      label: 'Pasos para reproducir'
       placeholder: |
         1. Iniciar sesión
         2. Ir a Datasets
@@ -62,33 +61,33 @@ body:
   - type: textarea
     id: expected
     attributes:
-      label: "Resultado esperado"
+      label: 'Resultado esperado'
     validations:
       required: true
 
   - type: textarea
     id: actual
     attributes:
-      label: "Resultado obtenido"
+      label: 'Resultado obtenido'
     validations:
       required: true
 
   - type: dropdown
     id: severity
     attributes:
-      label: "Severidad"
+      label: 'Severidad'
       options:
-        - "Crítica"
-        - "Alta"
-        - "Media"
-        - "Baja"
+        - 'Crítica'
+        - 'Alta'
+        - 'Media'
+        - 'Baja'
     validations:
       required: true
 
   - type: dropdown
     id: frequency
     attributes:
-      label: "Frecuencia"
+      label: 'Frecuencia'
       options:
         - Siempre
         - A veces
@@ -99,22 +98,22 @@ body:
   - type: textarea
     id: evidence
     attributes:
-      label: "Evidencia"
-      description: "Adjunta capturas, videos o logs."
-      placeholder: "Arrastra archivos aquí o pega enlaces."
+      label: 'Evidencia'
+      description: 'Adjunta capturas, videos o logs.'
+      placeholder: 'Arrastra archivos aquí o pega enlaces.'
 
   - type: input
     id: related
     attributes:
-      label: "Historia, tarea o PR relacionado"
-      placeholder: "Ejemplo: S1-07, #15"
+      label: 'Historia, tarea o PR relacionado'
+      placeholder: 'Ejemplo: S1-07, #15'
 
   - type: checkboxes
     id: checklist
     attributes:
-      label: "Verificación"
+      label: 'Verificación'
       options:
-        - label: "He revisado que no exista un Issue duplicado."
+        - label: 'He revisado que no exista un Issue duplicado.'
           required: true
-        - label: "No he incluido información sensible."
+        - label: 'No he incluido información sensible.'
           required: true
