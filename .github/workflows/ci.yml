@@ -40,8 +40,32 @@ jobs:
       - name: Run lint
         run: npm run lint
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         run: npm test -- --watch=false
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          summary=coverage/biogestor-frontend/coverage-summary.json
+          {
+            echo '### Cobertura (mínimo 70 %)'
+            if [ -f "$summary" ]; then
+              echo '| Métrica | Cubierto | Total | % | Estado |'
+              echo '| --- | --- | --- | --- | --- |'
+              jq -r '.total | to_entries[] | select(.key != "branchesTrue") | "| \(.key) | \(.value.covered) | \(.value.total) | \(.value.pct) | \(if .value.pct >= 70 then "✅" else "❌" end) |"' "$summary"
+            else
+              echo 'No se generó el reporte de cobertura.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: biogestor-frontend-coverage
+          path: coverage/biogestor-frontend
+          retention-days: 7
+          if-no-files-found: ignore
 
       - name: Build (production)
         run: npm run build

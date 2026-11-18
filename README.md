@@ -128,16 +128,18 @@ Genera la aplicación en `dist/`.
 npm test
 ```
 
-Ejecuta las pruebas del proyecto.
+Ejecuta las pruebas del proyecto y mide la cobertura de `src/app`. Si alguna métrica (sentencias, ramas, funciones o líneas) queda por debajo del 70 % exigido por la Definition of Done, el comando termina con error. El reporte HTML queda en `coverage/biogestor-frontend/index.html`.
 
 ## Integración continua
 
 El flujo `.github/workflows/ci.yml` se ejecuta con GitHub Actions en cada Pull Request y push hacia `develop` o `main`, y también puede lanzarse manualmente desde la pestaña Actions (`workflow_dispatch`). Con Node.js 24:
 
 1. Instala las dependencias con `npm ci` a partir de `package-lock.json`.
-2. Verifica las convenciones de código con ESLint (`npm run lint`).
-3. Ejecuta las pruebas unitarias (`npm test -- --watch=false`).
-4. Compila la aplicación en modo producción (`npm run build`), incluyendo los presupuestos de tamaño de `angular.json`.
-5. Publica la carpeta `dist/biogestor-frontend` como artefacto descargable durante 7 días.
+2. Verifica el formato con Prettier (`npm run format:check`). Para corregirlo en local: `npm run format`.
+3. Verifica las convenciones de código con ESLint (`npm run lint`).
+4. Ejecuta las pruebas unitarias con cobertura (`npm test -- --watch=false`). El paso falla si alguna métrica queda por debajo del 70 %.
+5. Publica el resumen de cobertura en la página de la ejecución (Summary) y el reporte HTML como artefacto `biogestor-frontend-coverage`, ambos aunque las pruebas fallen.
+6. Compila la aplicación en modo producción (`npm run build`), incluyendo los presupuestos de tamaño de `angular.json`.
+7. Publica la carpeta `dist/biogestor-frontend` como artefacto descargable durante 7 días.
 
 Se recomienda configurar este job como comprobación obligatoria en la protección de las ramas `develop` y `main`.
