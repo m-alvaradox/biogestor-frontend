@@ -45,7 +45,7 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 
 La ruta raíz `/` redirige a `/dashboard`. Las rutas desconocidas también redirigen al Dashboard.
 
-El inicio de sesión prepara CSRF con `GET /api/v1/auth/csrf/` y luego envía las credenciales a `POST /api/v1/auth/login/`. El token de acceso recibido se conserva solo en memoria; los indicadores del Dashboard siguen utilizando datos de ejemplo.
+El frontend prepara el inicio de sesión con `GET /api/v1/auth/csrf/` y envía las credenciales a `POST /api/v1/auth/login/`. Estos endpoints aún no existen en el backend (pendiente S2-07), así que el inicio de sesión todavía no puede completarse de extremo a extremo. Cuando el backend los implemente, el token de acceso recibido se conservará solo en memoria; los indicadores del Dashboard siguen utilizando datos de ejemplo.
 
 ## Conexión con el backend
 
