@@ -41,6 +41,14 @@ describe('Login', () => {
     expect(authService.login).not.toHaveBeenCalled();
   });
 
+  it('debe asociar etiquetas accesibles a usuario y contraseña', () => {
+    const usernameLabel = fixture.nativeElement.querySelector('label[for="username"]');
+    const passwordLabel = fixture.nativeElement.querySelector('label[for="password"]');
+
+    expect(usernameLabel?.textContent.trim()).toBe('Usuario');
+    expect(passwordLabel?.textContent.trim()).toBe('Contraseña');
+  });
+
   it('debe permitir mostrar y ocultar la contraseña', () => {
     expect(component.showPassword()).toBe(false);
 
