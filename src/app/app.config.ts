@@ -1,17 +1,8 @@
-import {
-  ApplicationConfig,
-  provideBrowserGlobalErrorListeners
-} from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 
-import {
-  provideRouter,
-  withComponentInputBinding
-} from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 
-import {
-  provideHttpClient,
-  withXsrfConfiguration,
-} from '@angular/common/http';
+import { provideHttpClient, withXsrfConfiguration } from '@angular/common/http';
 
 import { routes } from './app.routes';
 
@@ -19,10 +10,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
 
-    provideRouter(
-      routes,
-      withComponentInputBinding(),
-    ),
+    provideRouter(routes, withComponentInputBinding()),
 
     provideHttpClient(
       withXsrfConfiguration({

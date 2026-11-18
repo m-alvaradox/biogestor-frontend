@@ -1,10 +1,6 @@
-
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import {
-  HttpTestingController,
-  provideHttpClientTesting,
-} from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AuthService } from './auth.service';
@@ -15,11 +11,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        AuthService,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-      ],
+      providers: [AuthService, provideHttpClient(), provideHttpClientTesting()],
     });
 
     service = TestBed.inject(AuthService);
@@ -35,23 +27,21 @@ describe('AuthService', () => {
   });
 
   it('debe preparar CSRF antes de enviar credenciales', () => {
-    service.login({
-      username: 'usuario_prueba',
-      password: 'clave_prueba',
-    }).subscribe();
+    service
+      .login({
+        username: 'usuario_prueba',
+        password: 'clave_prueba',
+      })
+      .subscribe();
 
-    const csrfRequest = httpMock.expectOne(
-      '/api/v1/auth/csrf/',
-    );
+    const csrfRequest = httpMock.expectOne('/api/v1/auth/csrf/');
 
     expect(csrfRequest.request.method).toBe('GET');
     expect(csrfRequest.request.withCredentials).toBe(true);
 
     csrfRequest.flush(null);
 
-    const loginRequest = httpMock.expectOne(
-      '/api/v1/auth/login/',
-    );
+    const loginRequest = httpMock.expectOne('/api/v1/auth/login/');
 
     expect(loginRequest.request.method).toBe('POST');
     expect(loginRequest.request.withCredentials).toBe(true);
@@ -67,51 +57,45 @@ describe('AuthService', () => {
   });
 
   it('debe conservar el access token en memoria', () => {
-    service.login({
-      username: 'usuario_prueba',
-      password: 'clave_prueba',
-    }).subscribe();
+    service
+      .login({
+        username: 'usuario_prueba',
+        password: 'clave_prueba',
+      })
+      .subscribe();
 
-    httpMock
-      .expectOne('/api/v1/auth/csrf/')
-      .flush(null);
+    httpMock.expectOne('/api/v1/auth/csrf/').flush(null);
 
-    httpMock
-      .expectOne('/api/v1/auth/login/')
-      .flush({
-        access: 'token-simulado-123',
-      });
+    httpMock.expectOne('/api/v1/auth/login/').flush({
+      access: 'token-simulado-123',
+    });
 
-    expect(service.getAccessToken()).toBe(
-      'token-simulado-123',
-    );
+    expect(service.getAccessToken()).toBe('token-simulado-123');
   });
 
   it('debe manejar credenciales incorrectas', () => {
     const receivedErrors: HttpErrorResponse[] = [];
 
-    service.login({
-      username: 'usuario_prueba',
-      password: 'incorrecta',
-    }).subscribe({
-      error: (error: HttpErrorResponse) => {
-        receivedErrors.push(error);
-      },
-    });
-
-    httpMock
-      .expectOne('/api/v1/auth/csrf/')
-      .flush(null);
-
-    httpMock
-      .expectOne('/api/v1/auth/login/')
-      .flush(
-        { detail: 'Credenciales incorrectas' },
-        {
-          status: 401,
-          statusText: 'Unauthorized',
+    service
+      .login({
+        username: 'usuario_prueba',
+        password: 'incorrecta',
+      })
+      .subscribe({
+        error: (error: HttpErrorResponse) => {
+          receivedErrors.push(error);
         },
-      );
+      });
+
+    httpMock.expectOne('/api/v1/auth/csrf/').flush(null);
+
+    httpMock.expectOne('/api/v1/auth/login/').flush(
+      { detail: 'Credenciales incorrectas' },
+      {
+        status: 401,
+        statusText: 'Unauthorized',
+      },
+    );
 
     expect(receivedErrors).toHaveLength(1);
     expect(receivedErrors[0]).toBeInstanceOf(HttpErrorResponse);
@@ -122,24 +106,24 @@ describe('AuthService', () => {
   it('no debe enviar el login si falla CSRF', () => {
     const receivedErrors: HttpErrorResponse[] = [];
 
-    service.login({
-      username: 'usuario_prueba',
-      password: 'clave_prueba',
-    }).subscribe({
-      error: (error: HttpErrorResponse) => {
-        receivedErrors.push(error);
-      },
-    });
-
-    httpMock
-      .expectOne('/api/v1/auth/csrf/')
-      .flush(
-        { detail: 'Error al preparar CSRF' },
-        {
-          status: 500,
-          statusText: 'Internal Server Error',
+    service
+      .login({
+        username: 'usuario_prueba',
+        password: 'clave_prueba',
+      })
+      .subscribe({
+        error: (error: HttpErrorResponse) => {
+          receivedErrors.push(error);
         },
-      );
+      });
+
+    httpMock.expectOne('/api/v1/auth/csrf/').flush(
+      { detail: 'Error al preparar CSRF' },
+      {
+        status: 500,
+        statusText: 'Internal Server Error',
+      },
+    );
 
     httpMock.expectNone('/api/v1/auth/login/');
 
@@ -149,20 +133,18 @@ describe('AuthService', () => {
   });
 
   it('debe limpiar el token de memoria', () => {
-    service.login({
-      username: 'usuario_prueba',
-      password: 'clave_prueba',
-    }).subscribe();
+    service
+      .login({
+        username: 'usuario_prueba',
+        password: 'clave_prueba',
+      })
+      .subscribe();
 
-    httpMock
-      .expectOne('/api/v1/auth/csrf/')
-      .flush(null);
+    httpMock.expectOne('/api/v1/auth/csrf/').flush(null);
 
-    httpMock
-      .expectOne('/api/v1/auth/login/')
-      .flush({
-        access: 'token-temporal',
-      });
+    httpMock.expectOne('/api/v1/auth/login/').flush({
+      access: 'token-temporal',
+    });
 
     expect(service.getAccessToken()).not.toBeNull();
 

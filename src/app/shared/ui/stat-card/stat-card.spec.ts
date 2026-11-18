@@ -15,10 +15,7 @@ describe('StatCard', () => {
 
     fixture.componentRef.setInput('label', 'Datasets');
     fixture.componentRef.setInput('value', 42);
-    fixture.componentRef.setInput(
-      'description',
-      'Conjuntos de datos registrados',
-    );
+    fixture.componentRef.setInput('description', 'Conjuntos de datos registrados');
 
     await fixture.whenStable();
   });

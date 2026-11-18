@@ -1,4 +1,3 @@
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
@@ -21,10 +20,7 @@ describe('Login', () => {
 
     await TestBed.configureTestingModule({
       imports: [Login],
-      providers: [
-        provideRouter([]),
-        { provide: AuthService, useValue: authService },
-      ],
+      providers: [provideRouter([]), { provide: AuthService, useValue: authService }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Login);
@@ -92,11 +88,7 @@ describe('Login', () => {
   });
 
   it('debe mostrar un error de autenticación', () => {
-    authService.login.mockReturnValue(
-      throwError(
-        () => new HttpErrorResponse({ status: 401 }),
-      ),
-    );
+    authService.login.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 401 })));
 
     component.loginForm.setValue({
       username: 'usuario_prueba',
@@ -105,9 +97,7 @@ describe('Login', () => {
 
     component.onSubmit();
 
-    expect(component.authError()).toBe(
-      'Usuario o contraseña incorrectos.',
-    );
+    expect(component.authError()).toBe('Usuario o contraseña incorrectos.');
     expect(component.isLoading()).toBe(false);
   });
 });

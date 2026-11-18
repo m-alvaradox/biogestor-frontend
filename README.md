@@ -34,14 +34,14 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 
 ## Rutas disponibles
 
-| Ruta | Pantalla |
-|---|---|
-| `/login` | Inicio de sesión |
-| `/dashboard` | Panel principal con indicadores de demostración |
-| `/datasets` | Catálogo de datasets conectado a la API |
-| `/datasets/:id` | Detalle de un dataset |
-| `/integrations` | Prueba de integración del Sprint 0 (`/integration` redirige aquí) |
-| `/models`, `/model-versions`, `/experiments`, `/observations`, `/users`, `/settings` | Módulos pendientes, con una pantalla provisional |
+| Ruta                                                                                 | Pantalla                                                          |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| `/login`                                                                             | Inicio de sesión                                                  |
+| `/dashboard`                                                                         | Panel principal con indicadores de demostración                   |
+| `/datasets`                                                                          | Catálogo de datasets conectado a la API                           |
+| `/datasets/:id`                                                                      | Detalle de un dataset                                             |
+| `/integrations`                                                                      | Prueba de integración del Sprint 0 (`/integration` redirige aquí) |
+| `/models`, `/model-versions`, `/experiments`, `/observations`, `/users`, `/settings` | Módulos pendientes, con una pantalla provisional                  |
 
 La ruta raíz `/` redirige a `/dashboard`. Las rutas desconocidas también redirigen al Dashboard.
 
