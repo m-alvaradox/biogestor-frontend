@@ -36,7 +36,7 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 
 | Ruta                                                                                 | Pantalla                                                          |
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| `/login`                                                                             | Acceso de demostración                                            |
+| `/login`                                                                             | Inicio de sesión                                                  |
 | `/dashboard`                                                                         | Panel principal con indicadores de demostración                   |
 | `/datasets`                                                                          | Catálogo de datasets conectado a la API                           |
 | `/datasets/:id`                                                                      | Detalle de un dataset                                             |
@@ -45,11 +45,11 @@ Abre http://localhost:4200 en el navegador. La aplicación se actualiza al guard
 
 La ruta raíz `/` redirige a `/dashboard`. Las rutas desconocidas también redirigen al Dashboard.
 
-El acceso es simulado y los indicadores del Dashboard utilizan datos de ejemplo. Todavía no existe autenticación real.
+El inicio de sesión prepara CSRF con `GET /api/v1/auth/csrf/` y luego envía las credenciales a `POST /api/v1/auth/login/`. El token de acceso recibido se conserva solo en memoria; los indicadores del Dashboard siguen utilizando datos de ejemplo.
 
 ## Conexión con el backend
 
-`npm start` usa `proxy.conf.json`, que reenvía las peticiones a `/api/**` hacia el backend en http://localhost:8080. Las pantallas de Datasets e Integración necesitan el backend activo.
+`npm start` usa `proxy.conf.json`, que reenvía las peticiones a `/api/**` hacia el backend en http://localhost:8080. El inicio de sesión y las pantallas de Datasets e Integración necesitan el backend activo.
 
 ## Catálogo de datasets
 
