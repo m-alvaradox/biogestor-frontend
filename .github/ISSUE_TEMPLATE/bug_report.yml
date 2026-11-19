@@ -1,6 +1,6 @@
 name: '🐛 Bug Report'
-description: 'Reportar un error del frontend de BioGestor'
-title: '[Frontend] '
+description: 'Reportar un error en BioGestor'
+title: '[Bug] '
 labels: ['bug', 'área:frontend']
 body:
   - type: markdown
