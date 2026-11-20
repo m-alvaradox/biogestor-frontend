@@ -1,33 +1,55 @@
 ## Descripción
 
-Explica brevemente los cambios realizados.
+Describe el objetivo, los cambios realizados y su justificación.
 
-## Tarea relacionada
+## Tarea e Issues relacionados
 
-Planner: S0-XX
-GitHub Issue: #XX (si corresponde)
+- Planner: S1-XX
+- Issue: Closes #n (si corresponde; con base `develop` el Issue se cierra manualmente después del merge)
+- PR de backend (si aplica):
 
 ## Tipo de cambio
 
 - [ ] Nueva funcionalidad
-- [ ] Corrección de error
+- [ ] Corrección de bug
 - [ ] Refactorización
 - [ ] Documentación
 - [ ] Configuración
 
-## Verificaciones
+## Cómo probarlo
 
-- [ ] El proyecto compila correctamente.
-- [ ] Ejecuté las pruebas aplicables.
-- [ ] Revisé que no se incluyan credenciales.
-- [ ] Actualicé la documentación necesaria.
+**Precondiciones:**
 
-## Evidencia
+**Pasos para verificar el cambio:**
 
-Adjunta capturas, resultados de pruebas o instrucciones
-para comprobar los cambios, cuando corresponda.
+1.
+2.
+3.
+
+**Resultado esperado:**
+
+## Evidencia (obligatoria según tipo de cambio)
+
+- Capturas o GIF del flujo y validaciones.
+- Enlace a CI y resumen de cobertura.
+- Si aplica, evidencia de integración con backend.
+- No incluir datos sensibles de BioDynamics.
+- Nombrar las capturas con el formato `IDtarea_descripcion_AAAAMMDD` para una mejor trazabilidad.
+
+## Definition of Done
+
+- [ ] Cumple los criterios de aceptación.
+- [ ] Lint y formato sin errores.
+- [ ] Pruebas unitarias agregadas o actualizadas.
+- [ ] Cobertura del código nuevo ≥ 70 % y CI en verde.
+- [ ] Frontend compilado correctamente.
+- [ ] Sin credenciales ni datos sensibles.
+- [ ] Variables nuevas documentadas en .env.example (si aplica).
+- [ ] Integración con backend verificada (si aplica).
+- [ ] Evidencia de pruebas adjunta.
+- [ ] Documentación actualizada (si aplica).
 
 ## Observaciones
 
-Indica dependencias, limitaciones o aspectos
-que el revisor debe considerar.
+- Dependencias, limitaciones, excepciones o aspectos que el revisor debe considerar.
+- Justificar si el PR supera 400 líneas.
